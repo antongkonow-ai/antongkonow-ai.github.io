@@ -9,12 +9,14 @@
                     this.classList.add('is-loaded');
                 }, false);
             }
-        }</script><script async src="https://tally.so/widgets/embed.js"></script><style>/* Анимация пульсации */
-@keyframes robot-pulse {
+        }</script><script async src="https://tally.so/widgets/embed.js"></script><style>@keyframes robot-pulse {
   0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7); }
   70% { box-shadow: 0 0 0 15px rgba(33, 150, 243, 0); }
   100% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
 }
 .robot-btn {
   animation: robot-pulse 2s infinite;
-}</style><a href="#tally-open=44oayr&tally-layout=modal" class="robot-btn" style="position:fixed; width:60px; height:60px; bottom:110px; right:40px; background-color:#2196F3; color:#FFF; border-radius:50px; text-align:center; z-index:1000; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:30px; transition: 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">🤖</a></body></html>
+  /* Добавляем четкий приоритет для нажатия на мобиле */
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto !important;
+}</style><a href="#tally-open=44oayr&tally-layout=modal" class="robot-btn" style="position:fixed; width:60px; height:60px; bottom:120px; right:25px; background-color:#2196F3; color:#FFF; border-radius:50px; text-align:center; z-index:999999 !important; display:flex !important; align-items:center; justify-content:center; text-decoration:none; font-size:30px;">🤖</a></body></html>
