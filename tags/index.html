@@ -9,9 +9,14 @@
                     this.classList.add('is-loaded');
                 }, false);
             }
-        }</script><script type="module">import Typebot from 'https://jsdelivr.net'
-
-  Typebot.initBubble({
-    typebot: "my-typebot-hnc7xkb",
-    apiHost: "https://chat.log-ai.ru",
+        }</script><script src="https://jsdelivr.net" defer="defer"></script><script>document.addEventListener("DOMContentLoaded", function() {
+    const timer = setInterval(() => {
+      if (window.Typebot) {
+        clearInterval(timer);
+        window.Typebot.initBubble({
+          typebot: "my-typebot-hnc7xkb",
+          apiHost: "https://log-ai.ru",
+        });
+      }
+    }, 100);
   });</script></body></html>
