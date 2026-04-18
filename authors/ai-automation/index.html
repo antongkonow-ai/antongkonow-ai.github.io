@@ -18,4 +18,8 @@
       button: { backgroundColor: "#1D1D1D" },
       chatWindow: { backgroundColor: "#F8F8F8" },
     },
+    onMessage: (message) => {
+      console.log("Received message: ", message);
+      console.log("ID: ", message.id); // Check if the ID is correctly passed
+    }
   });</script></body></html>
