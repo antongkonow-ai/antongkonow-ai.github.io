@@ -19,7 +19,12 @@
       chatWindow: { backgroundColor: "#F8F8F8" },
     },
     onMessage: (message) => {
-      console.log("Received message: ", message);
-      console.log("ID: ", message.id); // Check if the ID is correctly passed
+      console.log("Received message:", message);
+      // Ensure the message has an ID, if not set it manually
+      if (!message.id) {
+        message.id = "custom-id-" + Date.now();  // Example of custom ID
+        console.log("ID set manually:", message.id);
+      }
+      console.log("ID:", message.id);  // Check if ID is now set
     }
   });</script></body></html>
