@@ -9,15 +9,13 @@
                     this.classList.add('is-loaded');
                 }, false);
             }
-        }</script><script src="https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js" defer="defer"></script><script>window.onload = function() {
-    if (window.Typebot) {
-      window.Typebot.initBubble({
-        typebot: "faq-3ae9cq5",
-        apiHost: "https://chat.log-ai.ru",
-        theme: {
-          button: { backgroundColor: "#1D1D1D" },
-          chatWindow: { backgroundColor: "#F8F8F8" },
-        },
-      });
-    }
-  };</script></body></html>
+        }</script><script type="module">import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
+
+  Typebot.initBubble({
+    typebot: "faq-3ae9cq5",
+    apiHost: "https://chat.log-ai.ru",
+    theme: {
+      button: { backgroundColor: "#1D1D1D" },
+      chatWindow: { backgroundColor: "#F8F8F8" },
+    },
+  });</script></body></html>
