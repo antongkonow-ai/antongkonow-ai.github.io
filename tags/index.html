@@ -9,22 +9,81 @@
                     this.classList.add('is-loaded');
                 }, false);
             }
-        }</script><script type="module">import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
-
-  Typebot.initBubble({
-    typebot: "my-typebot-hnc7xkb",
-    apiHost: "https://chat.log-ai.ru",
-    theme: {
-      button: { backgroundColor: "#1D1D1D" },
-      chatWindow: { backgroundColor: "#F8F8F8" },
-    },
-    onMessage: (message) => {
-      console.log("Received message:", message);
-      // Ensure the message has an ID, if not set it manually
-      if (!message.id) {
-        message.id = "custom-id-" + Date.now();  // Example of custom ID
-        console.log("ID set manually:", message.id);
-      }
-      console.log("ID:", message.id);  // Check if ID is now set
+        }</script><script>// 1. ПРОВЕРЬ ЭТОТ АДРЕС! Если Caddy настроен, пиши https://log-ai.ru
+    const API_URL = 'http://192.168.1.114:3010'; 
+    
+    let sessionId = localStorage.getItem('logai_sid');
+    if (!sessionId) {
+        sessionId = 'sn_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('logai_sid', sessionId);
     }
-  });</script></body></html>
+
+    const msgBox = document.getElementById('messages');
+
+    function addMessage(text, type, id = null) {
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+        div.innerText = text;
+        msgBox.appendChild(div);
+        msgBox.scrollTop = msgBox.scrollHeight;
+        return div;
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const btn = document.getElementById('send-btn');
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        input.disabled = true;
+        btn.disabled = true;
+
+        addMessage(text, 'user');
+
+        try {
+            const response = await fetch(`${API_URL}/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, message: text })
+            });
+            
+            if (!response.ok) throw new Error('Ошибка сервера');
+            
+            const data = await response.json();
+            if (data.messageId) {
+                pollAnswer(data.messageId);
+            }
+        } catch (e) {
+            addMessage('Ошибка: не удалось отправить сообщение.', 'ai');
+            input.disabled = false;
+            btn.disabled = false;
+        }
+    }
+
+    async function pollAnswer(mId) {
+        const aiMsg = addMessage('...', 'ai');
+        let attempts = 0;
+
+        const interval = setInterval(async () => {
+            attempts++;
+            try {
+                const res = await fetch(`${API_URL}/get-answer/${mId}`);
+                const data = await res.json();
+
+                if (data.answer) {
+                    clearInterval(interval);
+                    aiMsg.innerText = data.answer;
+                    document.getElementById('user-input').disabled = false;
+                    document.getElementById('send-btn').disabled = false;
+                } else if (attempts > 60) {
+                    clearInterval(interval);
+                    aiMsg.innerText = 'ИИ не ответил вовремя.';
+                    document.getElementById('user-input').disabled = false;
+                    document.getElementById('send-btn').disabled = false;
+                }
+            } catch (e) {
+                console.error('Опрос базы...');
+            }
+        }, 2000);
+    }</script></body></html>
