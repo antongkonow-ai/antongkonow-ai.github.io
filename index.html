@@ -9,9 +9,62 @@
                     this.classList.add('is-loaded');
                 }, false);
             }
-        }</script><style>#logai-widget * { box-sizing: border-box !important; }
+        }</script><style>/* Выносим всё оформление сюда, чтобы Publii не резал атрибуты style */
+    #logai-widget * { box-sizing: border-box !important; }
+    
+    #logai-btn {
+        position: fixed !important; bottom: 40px !important; right: 110px !important;
+        width: 65px !important; height: 65px !important;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+        border-radius: 50% !important; cursor: pointer !important;
+        display: flex !important; align-items: center !important; justify-content: center !important;
+        box-shadow: 0 10px 25px rgba(0,123,255,0.4) !important; z-index: 99999 !important;
+    }
+
+    #logai-window {
+        display: none; position: fixed !important; bottom: 115px !important; right: 110px !important;
+        width: 380px !important; height: 600px !important;
+        background: #3b3e45 !important; /* Антрацит */
+        border-radius: 24px !important; box-shadow: 0 25px 60px rgba(0,0,0,0.6) !important;
+        flex-direction: column !important; z-index: 99999 !important;
+        border: 1px solid rgba(255,255,255,0.15) !important; overflow: hidden !important;
+        font-family: sans-serif !important;
+    }
+
+    .logai-header {
+        background: #2d3035 !important; padding: 20px !important;
+        display: flex !important; justify-content: space-between !important;
+        align-items: center !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    }
+
+    #logai-msgs {
+        flex: 1 !important; overflow-y: auto !important; padding: 20px !important;
+        display: flex !important; flex-direction: column !important;
+        gap: 16px !important; background: #3b3e45 !important;
+    }
+
+    .logai-input-area {
+        padding: 20px !important; background: #2d3035 !important;
+        display: flex !important; gap: 10px !important; align-items: center !important;
+    }
+
+    #logai-input {
+        flex: 1 !important; padding: 13px 20px !important; border-radius: 25px !important;
+        background: #4a4e56 !important; border: 1px solid rgba(255,255,255,0.1) !important;
+        color: #ffffff !important; outline: none !important;
+    }
+
+    #logai-send-btn {
+        background: #007bff !important; border: none !important;
+        width: 45px !important; height: 45px !important; border-radius: 50% !important;
+        cursor: pointer !important; display: flex !important;
+        align-items: center !important; justify-content: center !important;
+        color: white !important; font-size: 20px !important;
+    }
+
+    /* Анимация точек */
     @keyframes logai-bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
-    .logai-dots span { display: inline-block; width: 5px; height: 5px; background: #aaa !important; border-radius: 50% !important; margin-right: 3px !important; animation: logai-bounce 1.4s infinite ease-in-out !important; }</style><div id="logai-widget"><div id="logai-btn" onclick="toggleLogAI()" style="position:fixed !important; bottom:40px !important; right:110px !important; width:65px !important; height:65px !important; background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important; border-radius:50% !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important; box-shadow:0 10px 25px rgba(0,123,255,0.4) !important; z-index:100000 !important;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><div id="logai-window" style="display:none; position:fixed !important; bottom:115px !important; right:110px !important; width:380px !important; height:600px !important; background:#3b3e45 !important; border-radius:24px !important; box-shadow:0 25px 60px rgba(0,0,0,0.6) !important; flex-direction:column !important; z-index:100000 !important; border: 1px solid rgba(255,255,255,0.2) !important; overflow:hidden !important;"><div style="background: #2d3035 !important; padding:20px !important; display:flex !important; justify-content:space-between !important; align-items:center !important; border-bottom: 1px solid rgba(255,255,255,0.1) !important;"><div style="display:flex !important; align-items:center !important; gap:10px !important;"><div style="width:10px !important; height:10px !important; background:#28a745 !important; border-radius:50% !important; box-shadow:0 0 10px #28a745 !important;"></div><span style="font-weight:600 !important; color:#ffffff !important; font-size:16px !important;">AI Архитектор</span></div><span onclick="toggleLogAI()" style="cursor:pointer !important; color:#ffffff !important; font-size:35px !important; line-height: 0.7 !important; padding:10px !important;">&times;</span></div><div id="logai-msgs" style="flex:1 !important; overflow-y:auto !important; padding:20px !important; display:flex !important; flex-direction:column !important; gap:16px !important; background:#3b3e45 !important;"></div><div style="padding:20px !important; background:#2d3035 !important; display:flex !important; gap:10px !important; align-items:center !important;"><input type="text" id="logai-input" style="flex:1 !important; padding:13px 20px !important; border-radius:25px !important; background:#4a4e56 !important; border:1px solid rgba(255,255,255,0.1) !important; color:#ffffff !important; outline:none !important;" placeholder="Напишите..."> <button onclick="sendLogAI()" style="background:#007bff !important; border:none !important; width:45px !important; height:45px !important; border-radius:50% !important; cursor:pointer !important; display:flex !important; align-items:center !important; justify-content:center !important;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button></div></div></div><script>const API_URL = 'https://api.log-ai.ru'; 
+    .logai-dots span { display: inline-block; width: 5px; height: 5px; background: #aaa !important; border-radius: 50%; margin-right: 3px; animation: logai-bounce 1.4s infinite ease-in-out; }</style><div id="logai-widget"><div id="logai-btn" onclick="toggleLogAI()"><span style="color: white; font-size: 30px;">💬</span></div><div id="logai-window"><div class="logai-header"><div style="display:flex; align-items:center; gap:10px;"><div style="width:10px; height:10px; background:#28a745; border-radius:50%; box-shadow:0 0 10px #28a745;"></div><span style="color: white; font-weight: bold;">AI Архитектор</span></div><span onclick="toggleLogAI()" style="cursor:pointer; color:white; font-size:30px;">&times;</span></div><div id="logai-msgs"></div><div class="logai-input-area"><input type="text" id="logai-input" placeholder="Напишите..." onkeypress="if(event.key==='Enter') sendLogAI()"> <button id="logai-send-btn" onclick="sendLogAI()">➤</button></div></div></div><script>const API_URL = 'https://api.log-ai.ru'; 
 
     function toggleLogAI() {
         const w = document.getElementById('logai-window');
