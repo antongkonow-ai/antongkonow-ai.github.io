@@ -73,13 +73,17 @@
     localStorage.setItem('logai_sid', logSid);
 
     let isWaiting = false;
+    let historyLoaded = false; // Флаг для загрузки истории только один раз
 
     function toggleLogAI() {
         const w = document.getElementById('logai-window');
         const isOpen = (w.style.display === 'none' || w.style.display === '');
         if (isOpen) {
             w.style.display = 'flex';
-            loadChatHistory(); 
+            // Загружаем историю только при первом открытии
+            if (!historyLoaded) {
+                loadChatHistory();
+            }
         } else {
             w.style.display = 'none';
         }
@@ -104,31 +108,37 @@
 
     async function loadChatHistory() {
         const box = document.getElementById('logai-msgs');
-        box.innerHTML = ''; 
+        box.innerHTML = ''; // Очищаем перед загрузкой
+
         try {
             const res = await fetch(`${API_URL}/history/${logSid}`);
             const data = await res.json();
+            
             if (!Array.isArray(data)) return;
             data.forEach(msg => {
-                if (msg.message) addLogMsg(msg.message, false);
-                if (msg.answer) addLogMsg(msg.answer, true);
+                if (msg.message) addLogMsg(msg.message, false); // Вопрос юзера
+                if (msg.answer) addLogMsg(msg.answer, true);   // Ответ бота
             });
-        } catch (err) { console.error('Ошибка истории:', err); }
+            historyLoaded = true; // История загружена
+        } catch (err) { 
+            console.error('Ошибка истории:', err); 
+        }
     }
 
     async function sendLogAI() {
-        if (isWaiting) return;
+        if (isWaiting) return; // Блокируем отправку, пока идет обработка
+
         const el = document.getElementById('logai-input');
         const btn = document.getElementById('logai-send-btn');
         const msg = el.value.trim();
-        if (!msg) return;
+        if (!msg) return; // Если сообщение пустое — не отправляем
 
         isWaiting = true;
         if(el) { el.disabled = true; el.style.opacity = '0.5'; }
         if(btn) { btn.style.opacity = '0.5'; }
-        
-        el.value = '';
-        addLogMsg(msg, false);
+
+        el.value = ''; // Очищаем поле ввода
+        addLogMsg(msg, false); // Показываем сообщение пользователя
 
         try {
             const res = await fetch(`${API_URL}/send`, {
@@ -137,11 +147,11 @@
                 body: JSON.stringify({ sessionId: logSid, message: msg, clientId: 'client_arhitektor' })
             });
             
-            if (!res.ok) throw new Error('Server error');
+            if (!res.ok) throw new Error('Server error'); // Если ошибка от сервера
             const data = await res.json();
             
             if (data.messageId) {
-                const aiMsg = addLogMsg('dots', true);
+                const aiMsg = addLogMsg('dots', true); // Показываем индикатор загрузки
                 let startTime = Date.now();
                 let interval = 3000;
                 let errorCount = 0;
@@ -160,7 +170,7 @@
                         }
                         if (elapsed > 180 && aiMsg.innerText !== 'Обрабатываю запрос...') {
                             aiMsg.innerText = 'Обрабатываю запрос...';
-                            interval = 25000;
+                            interval = 25000; // Интервал ожидания увеличиваем
                         }
                         setTimeout(poll, interval);
                     } catch (e) {
@@ -186,5 +196,5 @@
         if(el) { el.disabled = false; el.style.opacity = '1'; }
         if(btn) { btn.style.opacity = '1'; }
         if (msgElement) msgElement.innerText = text;
-        else addLogMsg(text, true);
+        else addLogMsg(text, true); // Если ошибка, показываем сообщение бота
     }</script></body></html>
