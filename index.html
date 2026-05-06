@@ -93,38 +93,49 @@
     }
 
     async function loadChatHistory() {
-        const box = document.getElementById('logai-msgs');
-        try {
-            const res = await fetch(`${API_URL}/history/${logSid}?platform=site`);
-            const data = await res.json();
+    const box = document.getElementById('logai-msgs');
+    try {
+        const res = await fetch(`${API_URL}/history/${logSid}?platform=site`);
+        const data = await res.json();
 
-            box.innerHTML = '';
+        box.innerHTML = '';
 
-            if (Array.isArray(data) && data.length > 0) {
-                for (const m of data) {
-                    if (m.message) addLogMsg(m.message, false);
-                    
-                    if (m.answer) {
-                        addLogMsg(m.answer, true);
-                    } else if (m.message_id) {
-                        chatIsWaiting = true;
-                        activeMessageId = m.message_id;
-                        const aiMsg = addLogMsg('dots', true);
-                        startPolling(m.message_id, aiMsg);
-                    }
+        let foundPending = false;
+
+        if (Array.isArray(data) && data.length > 0) {
+            
+            for (const m of data) {
+                // Показываем сообщение пользователя
+                if (m.message) {
+                    addLogMsg(m.message, false);
                 }
-            } else {
-                addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем могу помочь?", true);
+
+                // Если есть готовый ответ — показываем его
+                if (m.answer) {
+                    addLogMsg(m.answer, true);
+                } 
+                // Если сообщение без ответа — это pending
+                else if (m.message_id) {
+                    foundPending = true;
+                    chatIsWaiting = true;
+                    activeMessageId = m.message_id;
+                    
+                    const aiMsg = addLogMsg('dots', true);
+                    startPolling(m.message_id, aiMsg);   // ← Перезапускаем polling
+                }
             }
-
-            historyLoaded = true;
-            updateInputState();
-
-        } catch (e) {
-            console.error('History error:', e);
-            addLogMsg("Не удалось загрузить историю чата", true);
+        } else {
+            addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем могу помочь?", true);
         }
+
+        historyLoaded = true;
+        updateInputState();
+
+    } catch (e) {
+        console.error('History error:', e);
+        addLogMsg("Не удалось загрузить историю чата", true);
     }
+}
 
     async function sendLogAI() {
         if (chatIsWaiting) return;
