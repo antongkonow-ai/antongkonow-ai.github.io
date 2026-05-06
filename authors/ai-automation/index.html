@@ -29,8 +29,8 @@
         outline: none !important; color: #fff !important; font-size: 15px !important;
         resize: none !important; max-height: 120px !important; line-height: 1.4 !important;
         overflow-y: auto !important; font-family: inherit !important;
-    }</style><div id="logai-widget"><div id="logai-btn" onclick="toggleLogAI()" style="position:fixed; bottom:40px; right:110px; width:65px; height:65px; background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 25px rgba(0,123,255,0.4); z-index:10000; transition: all 0.3s ease;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><div id="logai-window" style="display:none; position:fixed; bottom:115px; right:110px; width:380px; height:600px; background:#3b3e45; border-radius:24px; box-shadow:0 25px 60px rgba(0,0,0,0.6); flex-direction:column; z-index:10000; font-family: 'Segoe UI', Roboto, sans-serif; overflow:hidden; border: 1px solid rgba(255,255,255,0.15);"><div style="background: #2d3035; padding:20px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1);"><div style="display:flex; align-items:center; gap:10px;"><div style="width:10px; height:10px; background:#28a745; border-radius:50%; box-shadow:0 0 10px #28a745;"></div><span style="font-weight:600; color:#fff; font-size:16px;">AI Ассистент</span></div><span onclick="toggleLogAI()" style="cursor:pointer; color:#fff; font-size:35px; font-weight:200; padding: 0 15px; line-height: 0.7; opacity: 0.7;">&times;</span></div><div id="logai-msgs" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:16px; background:#3b3e45;"></div><div style="padding:15px; background:#2d3035; display:flex; gap:10px; align-items:flex-end; border-top: 1px solid rgba(255,255,255,0.1);"><textarea id="logai-input" rows="1" placeholder="Напишите..." oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendLogAI();}"></textarea> <button id="logai-send-btn" onclick="sendLogAI()" style="background:#007bff; border:none; width:45px; height:45px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button></div></div></div><script src="https://cdn.jsdelivr.net/npm/marked@4.0.12/lib/marked.min.js"></script><script>const API_URL = 'https://api.log-ai.ru'; 
-    let logSid = localStorage.getItem('logai_sid') || 's_' + Math.random().toString(36).substr(2, 9);
+    }</style><div id="logai-widget"><div id="logai-btn" onclick="toggleLogAI()" style="position:fixed; bottom:40px; right:110px; width:65px; height:65px; background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 25px rgba(0,123,255,0.4); z-index:10000; transition: all 0.3s ease;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><div id="logai-window" style="display:none; position:fixed; bottom:115px; right:110px; width:380px; height:600px; background:#3b3e45; border-radius:24px; box-shadow:0 25px 60px rgba(0,0,0,0.6); flex-direction:column; z-index:10000; font-family: 'Segoe UI', Roboto, sans-serif; overflow:hidden; border: 1px solid rgba(255,255,255,0.15);"><div style="background: #2d3035; padding:20px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1);"><div style="display:flex; align-items:center; gap:10px;"><div style="width:10px; height:10px; background:#28a745; border-radius:50%; box-shadow:0 0 10px #28a745;"></div><span style="font-weight:600; color:#fff; font-size:16px;">AI Ассистент</span></div><span onclick="toggleLogAI()" style="cursor:pointer; color:#fff; font-size:35px; font-weight:200; padding: 0 15px; line-height: 0.7; opacity: 0.7;">&times;</span></div><div id="logai-msgs" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:16px; background:#3b3e45;"></div><div style="padding:15px; background:#2d3035; display:flex; gap:10px; align-items:flex-end; border-top: 1px solid rgba(255,255,255,0.1);"><textarea id="logai-input" rows="1" placeholder="Напишите..." oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendLogAI();}"></textarea> <button id="logai-send-btn" onclick="sendLogAI()" style="background:#007bff; border:none; width:45px; height:45px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button></div></div></div><script src="https://cdn.jsdelivr.net/npm/marked@4.0.12/lib/marked.min.js"></script><script>const API_URL = 'https://api.log-ai.ru';
+    let logSid = localStorage.getItem('logai_sid') || 's_' + Math.random().toString(36).substr(2, 12);
     localStorage.setItem('logai_sid', logSid);
 
     let isWaiting = false;
@@ -42,6 +42,7 @@
     function toggleLogAI() {
         const w = document.getElementById('logai-window');
         const isOpen = (w.style.display === 'none' || w.style.display === '');
+
         if (isOpen) {
             w.style.display = 'flex';
             if (!historyLoaded) loadChatHistory();
@@ -54,77 +55,84 @@
     function stopPolling() {
         if (pollController) pollController.abort();
         if (pollTimeoutId) clearTimeout(pollTimeoutId);
+        
         pollController = null;
         pollTimeoutId = null;
         activeMessageId = null;
         isWaiting = false;
-        
+
         const input = document.getElementById('logai-input');
         const btn = document.getElementById('logai-send-btn');
-        if(input) { input.disabled = false; input.style.opacity = '1'; }
-        if(btn) { btn.style.opacity = '1'; }
+        if (input) {
+            input.disabled = false;
+            input.style.opacity = '1';
+        }
+        if (btn) btn.style.opacity = '1';
     }
 
     function addLogMsg(txt, isAi) {
         const d = document.createElement('div');
-        d.style = `padding:12px 16px; border-radius:18px; max-width:82%; font-size:14px; line-height:1.5; margin-bottom:10px; ${isAi ? 'align-self:flex-start; background:#4a4e56; color:#dbdee1; border-bottom-left-radius:4px;' : 'align-self:flex-end; background:#007bff; color:white; border-bottom-right-radius:4px; box-shadow:0 4px 12px rgba(0,123,255,0.25);'}`;
-        
+        d.style = `padding:12px 16px; border-radius:18px; max-width:82%; font-size:14px; line-height:1.5; margin-bottom:10px; 
+                   ${isAi ? 'align-self:flex-start; background:#4a4e56; color:#dbdee1; border-bottom-left-radius:4px;' 
+                         : 'align-self:flex-end; background:#007bff; color:white; border-bottom-right-radius:4px; box-shadow:0 4px 12px rgba(0,123,255,0.25);'}`;
+
         if (txt === 'dots') {
             d.innerHTML = '<div class="logai-dots"><span></span><span></span><span></span></div>';
         } else {
             d.innerHTML = typeof marked !== 'undefined' ? marked.parse(txt) : txt;
         }
+
         const box = document.getElementById('logai-msgs');
         box.appendChild(d);
         box.scrollTop = box.scrollHeight;
         return d;
     }
 
-    // ТА САМАЯ ИСТОРИЯ - ОНА НУЖНА!
     async function loadChatHistory() {
         const box = document.getElementById('logai-msgs');
         try {
             const res = await fetch(`${API_URL}/history/${logSid}?platform=site`);
             const data = await res.json();
-            box.innerHTML = ''; 
+
+            box.innerHTML = '';
+
             if (Array.isArray(data) && data.length > 0) {
                 data.forEach(m => {
                     if (m.message) addLogMsg(m.message, false);
                     if (m.answer) {
                         addLogMsg(m.answer, true);
-                    } else {
-                        // ВОТ ЭТО ДОБАВЬ: если ответа в базе нет, блокируем ввод и ждем
-                        isWaiting = true; 
-                        const input = document.getElementById('logai-input');
-                        if(input) { input.disabled = true; input.style.opacity = '0.5'; }
-                        
+                    } else if (m.message_id) {
+                        // Незавершённое сообщение
+                        isWaiting = true;
                         const aiMsg = addLogMsg('dots', true);
                         startPolling(m.message_id, aiMsg);
                     }
                 });
             } else {
-                addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем я могу вам помочь?", true);
+                addLogMsg("Здравствуйте! Я ваш ИИ-ассистент Log-AI. Чем могу помочь?", true);
             }
+
             historyLoaded = true;
-        } catch (e) { 
-            console.error('History error:', e); 
+        } catch (e) {
+            console.error('History error:', e);
+            addLogMsg("Ошибка загрузки истории", true);
         }
     }
 
-
     async function sendLogAI() {
         if (isWaiting) return;
-        const el = document.getElementById('logai-input');
+
+        const input = document.getElementById('logai-input');
         const btn = document.getElementById('logai-send-btn');
-        const msg = el.value.trim();
+        const msg = input.value.trim();
+
         if (!msg) return;
 
         isWaiting = true;
-        el.disabled = true;
-        el.style.opacity = '0.5';
+        input.disabled = true;
+        input.style.opacity = '0.5';
         btn.style.opacity = '0.5';
-        el.value = '';
-        el.style.height = 'auto';
+        input.value = '';
 
         addLogMsg(msg, false);
         const aiMsg = addLogMsg('dots', true);
@@ -133,17 +141,18 @@
             const res = await fetch(`${API_URL}/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    sessionId: logSid, 
-                    message: msg, 
-                    clientId: 'web_user', 
-                    platform: 'site' 
+                body: JSON.stringify({
+                    sessionId: logSid,
+                    message: msg,
+                    clientId: 'web_user',
+                    platform: 'site'
                 })
             });
+
             const data = await res.json();
-            
+
             if (data.blocked) {
-                finish(data.message, aiMsg);
+                finish(data.message || "Сообщение заблокировано", aiMsg);
                 return;
             }
 
@@ -151,34 +160,42 @@
                 activeMessageId = data.messageId;
                 startPolling(data.messageId, aiMsg);
             } else {
-                finish("Ошибка сервера. Попробуйте позже.", aiMsg);
+                finish("Ошибка получения ответа", aiMsg);
             }
-        } catch (e) { 
-            finish("Ошибка связи с сервером.", aiMsg); 
+        } catch (e) {
+            console.error(e);
+            finish("Ошибка связи с сервером", aiMsg);
         }
     }
 
     function startPolling(messageId, aiMsg) {
-        activeMessageId = messageId; // <-- ОБЯЗАТЕЛЬНО ДОБАВИТЬ ЭТО
+        activeMessageId = messageId;
         pollController = new AbortController();
         let startTime = Date.now();
 
         const poll = async () => {
             if (activeMessageId !== messageId) return;
+
             try {
-                const r = await fetch(`${API_URL}/get-answer/${messageId}`, { signal: pollController.signal });
+                const r = await fetch(`${API_URL}/get-answer/${messageId}`, { 
+                    signal: pollController.signal 
+                });
                 const d = await r.json();
+
                 if (d.answer) {
                     finish(d.answer, aiMsg);
                 } else if ((Date.now() - startTime) > 120000) {
-                    finish("ИИ долго отвечает, попробуйте позже.", aiMsg);
+                    finish("ИИ долго думает, попробуйте позже", aiMsg);
                 } else {
-                    pollTimeoutId = setTimeout(poll, 3000);
+                    pollTimeoutId = setTimeout(poll, 2500); // чуть быстрее
                 }
             } catch (e) {
-                if (e.name !== 'AbortError') pollTimeoutId = setTimeout(poll, 3000);
+                if (e.name !== 'AbortError') {
+                    pollTimeoutId = setTimeout(poll, 3000);
+                }
             }
         };
+
         poll();
     }
 
@@ -187,4 +204,12 @@
             msgElement.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
         }
         stopPolling();
-    }</script></body></html>
+    }
+
+    // Добавь это в конец (удобно)
+    document.getElementById('logai-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendLogAI();
+        }
+    });</script></body></html>
