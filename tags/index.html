@@ -92,7 +92,7 @@
         return d;
     }
 
-    async function loadChatHistory() {
+ async function loadChatHistory() {
     const box = document.getElementById('logai-msgs');
     try {
         const res = await fetch(`${API_URL}/history/${logSid}?platform=site`);
@@ -100,30 +100,26 @@
 
         box.innerHTML = '';
 
-        let foundPending = false;
-
         if (Array.isArray(data) && data.length > 0) {
-            
-            for (const m of data) {
-                // Показываем сообщение пользователя
+            data.forEach((m, index) => {
+                // 1. Показываем сообщение пользователя
                 if (m.message) {
                     addLogMsg(m.message, false);
                 }
 
-                // Если есть готовый ответ — показываем его
+                // 2. Если есть готовый ответ — показываем
                 if (m.answer) {
                     addLogMsg(m.answer, true);
                 } 
-                // Если сообщение без ответа — это pending
-                else if (m.message_id) {
-                    foundPending = true;
+                // 3. Если это ПОСЛЕДНЕЕ сообщение и ответа нет — включаем ожидание
+                else if (m.message_id && index === data.length - 1) {
                     chatIsWaiting = true;
                     activeMessageId = m.message_id;
                     
                     const aiMsg = addLogMsg('dots', true);
-                    startPolling(m.message_id, aiMsg);   // ← Перезапускаем polling
+                    startPolling(m.message_id, aiMsg); 
                 }
-            }
+            });
         } else {
             addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем могу помочь?", true);
         }
@@ -136,7 +132,6 @@
         addLogMsg("Не удалось загрузить историю чата", true);
     }
 }
-
     async function sendLogAI() {
         if (chatIsWaiting) return;
 
