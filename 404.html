@@ -9,7 +9,7 @@
                     this.classList.add('is-loaded');
                 }, false);
             }
-        }</script><script src="https://cdn.jsdelivr.net/npm/marked@4.0.12/lib/marked.min.js"></script><script>const API_URL = 'https://api.log-ai.ru'; 
+        }</script><script src="https://jsdelivr.net"></script><script>const API_URL = 'https://log-ai.ru'; 
     let logSid = localStorage.getItem('logai_sid') || 's_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem('logai_sid', logSid);
 
@@ -39,7 +39,6 @@
         activeMessageId = null;
         isWaiting = false;
         
-        // Разблокируем интерфейс
         const input = document.getElementById('logai-input');
         const btn = document.getElementById('logai-send-btn');
         if(input) { input.disabled = false; input.style.opacity = '1'; }
@@ -61,38 +60,57 @@
         return d;
     }
 
-    // --- ФУНКЦИЯ ОТПРАВКИ (ИСПРАВЛЕНО) ---
-    async function sendLogAI() {
-        const input = document.getElementById('logai-input');
-        const btn = document.getElementById('logai-send-btn');
-        const msg = input.value.trim();
+    // ТА САМАЯ ИСТОРИЯ - ОНА НУЖНА!
+    async function loadChatHistory() {
+        const box = document.getElementById('logai-msgs');
+        try {
+            const res = await fetch(`${API_URL}/history/${logSid}?platform=site`);
+            const data = await res.json();
+            box.innerHTML = ''; // Чистим перед загрузкой
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(m => {
+                    if (m.message) addLogMsg(m.message, false);
+                    if (m.answer) addLogMsg(m.answer, true);
+                });
+            } else {
+                addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем я могу вам помочь?", true);
+            }
+            historyLoaded = true;
+        } catch (e) { 
+            console.error('History error:', e); 
+        }
+    }
 
-        if (!msg || isWaiting) return;
+    async function sendLogAI() {
+        if (isWaiting) return;
+        const el = document.getElementById('logai-input');
+        const btn = document.getElementById('logai-send-btn');
+        const msg = el.value.trim();
+        if (!msg) return;
 
         isWaiting = true;
-        input.value = '';
-        input.style.height = 'auto';
-        input.disabled = true;
-        input.style.opacity = '0.5';
+        el.disabled = true;
+        el.style.opacity = '0.5';
         btn.style.opacity = '0.5';
+        el.value = '';
+        el.style.height = 'auto';
 
         addLogMsg(msg, false);
         const aiMsg = addLogMsg('dots', true);
 
         try {
-            const response = await fetch(`${API_URL}/send`, {
+            const res = await fetch(`${API_URL}/send`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    sessionId: logSid,
-                    message: msg,
-                    platform: 'site',
-                    clientId: 'web_user'
+                body: JSON.stringify({ 
+                    sessionId: logSid, 
+                    message: msg, 
+                    clientId: 'web_user', 
+                    platform: 'site' 
                 })
             });
-
-            const data = await response.json();
-
+            const data = await res.json();
+            
             if (data.blocked) {
                 finish(data.message, aiMsg);
                 return;
@@ -104,27 +122,24 @@
             } else {
                 finish("Ошибка сервера. Попробуйте позже.", aiMsg);
             }
-        } catch (e) {
-            console.error('Send error:', e);
-            finish("Ошибка связи с сервером.", aiMsg);
+        } catch (e) { 
+            finish("Ошибка связи с сервером.", aiMsg); 
         }
     }
 
     function startPolling(messageId, aiMsg) {
-        let startTime = Date.now();
         pollController = new AbortController();
+        let startTime = Date.now();
 
         const poll = async () => {
             if (activeMessageId !== messageId) return;
-            
             try {
                 const r = await fetch(`${API_URL}/get-answer/${messageId}`, { signal: pollController.signal });
                 const d = await r.json();
-
                 if (d.answer) {
                     finish(d.answer, aiMsg);
                 } else if ((Date.now() - startTime) > 120000) {
-                    finish("Время ожидания истекло.", aiMsg);
+                    finish("ИИ долго отвечает, попробуйте позже.", aiMsg);
                 } else {
                     pollTimeoutId = setTimeout(poll, 3000);
                 }
@@ -140,22 +155,4 @@
             msgElement.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
         }
         stopPolling();
-    }
-
-    async function loadChatHistory() {
-        const box = document.getElementById('logai-msgs');
-        try {
-            const res = await fetch(`${API_URL}/history/${logSid}?platform=site`);
-            const data = await res.json();
-            box.innerHTML = '';
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(m => {
-                    if (m.message) addLogMsg(m.message, false);
-                    if (m.answer) addLogMsg(m.answer, true);
-                });
-            } else {
-                addLogMsg("Здравствуйте! Чем я могу вам помочь?", true);
-            }
-            historyLoaded = true;
-        } catch (e) { console.error('History error:', e); }
     }</script></body></html>
