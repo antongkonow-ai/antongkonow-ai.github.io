@@ -226,9 +226,29 @@
         activeMessageId = messageId;
         pollController = new AbortController();
         let startTime = Date.now();
+        let statusChanged = false; // Чтобы не менять текст постоянно
 
         const poll = async () => {
             if (activeMessageId !== messageId) return;
+
+            const elapsed = (Date.now() - startTime) / 1000; // секунд прошло
+
+            // 1. На 40-й секунде меняем текст на "Сложный вопрос"
+            if (elapsed > 40 && !statusChanged) {
+                const dots = aiMsg.querySelector('.logai-dots');
+                aiMsg.innerHTML = '🤖 Вопрос сложный, анализирую данные...';
+                if (dots) aiMsg.appendChild(dots); 
+                statusChanged = true;
+            }
+
+            // 2. Лимит ожидания - 10 минут (600 секунд)
+            if (elapsed > 600) {
+                finish("🤖 Извините, ИИ перегружен или запрос слишком сложный. Пожалуйста, попробуйте позже.", aiMsg);
+                return;
+            }
+
+            // 3. Умный интервал: до 50 сек — каждые 3 сек, потом — каждые 10 сек
+            let nextInterval = (elapsed > 50) ? 10000 : 3000;
 
             try {
                 const r = await fetch(`${API_URL}/get-answer/${messageId}`, { signal: pollController.signal });
@@ -236,14 +256,12 @@
 
                 if (d.answer) {
                     finish(d.answer, aiMsg);
-                } else if ((Date.now() - startTime) > 120000) {
-                    finish("ИИ долго отвечает, попробуйте позже", aiMsg);
                 } else {
-                    pollTimeoutId = setTimeout(poll, 2500);
+                    pollTimeoutId = setTimeout(poll, nextInterval);
                 }
             } catch (e) {
                 if (e.name !== 'AbortError') {
-                    pollTimeoutId = setTimeout(poll, 3000);
+                    pollTimeoutId = setTimeout(poll, nextInterval);
                 }
             }
         };
