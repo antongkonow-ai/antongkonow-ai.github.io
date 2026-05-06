@@ -34,7 +34,6 @@
     let logSid = localStorage.getItem('logai_sid') || 's_' + Math.random().toString(36).substr(2, 12);
     localStorage.setItem('logai_sid', logSid);
 
-    // ← Только одно объявление isWaiting
     let isWaiting = false;
     let historyLoaded = false;
     let activeMessageId = null;
@@ -66,7 +65,6 @@
     function stopPolling() {
         if (pollController) pollController.abort();
         if (pollTimeoutId) clearTimeout(pollTimeoutId);
-        
         pollController = null;
         pollTimeoutId = null;
         activeMessageId = null;
@@ -126,12 +124,10 @@
         }
     }
 
-
     async function sendLogAI() {
         if (isWaiting) return;
 
         const input = document.getElementById('logai-input');
-        const btn = document.getElementById('logai-send-btn');
         const msg = input.value.trim();
         if (!msg) return;
 
@@ -167,7 +163,6 @@
                 finish("Ошибка сервера", aiMsg);
             }
         } catch (e) {
-            console.error(e);
             finish("Ошибка связи с сервером", aiMsg);
         }
     }
@@ -189,7 +184,7 @@
                 } else if ((Date.now() - startTime) > 120000) {
                     finish("ИИ долго отвечает, попробуйте позже", aiMsg);
                 } else {
-                    pollTimeoutId = setTimeout(poll, 3000);
+                    pollTimeoutId = setTimeout(poll, 2500);
                 }
             } catch (e) {
                 if (e.name !== 'AbortError') {
