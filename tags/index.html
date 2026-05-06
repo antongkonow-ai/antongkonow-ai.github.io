@@ -9,9 +9,25 @@
                     this.classList.add('is-loaded');
                 }, false);
             }
-        }</script><style>/* Прыгающие точки */
-    @keyframes logai-bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
-    .logai-dots span { display: inline-block; width: 5px; height: 5px; background: #aaa !important; border-radius: 50%; margin-right: 3px; animation: logai-bounce 1.4s infinite ease-in-out; }
+        }</script><style>@keyframes logai-bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
+    
+    /* Фикс: точки строго в ряд */
+    .logai-dots { 
+        display: flex !important; 
+        flex-direction: row !important; 
+        gap: 4px !important; 
+        align-items: center !important; 
+        height: 12px !important; 
+    }
+
+    .logai-dots span { 
+        display: inline-block; 
+        width: 5px; 
+        height: 5px; 
+        background: #aaa !important; 
+        border-radius: 50%; 
+        animation: logai-bounce 1.4s infinite ease-in-out; 
+    }
     .logai-dots span:nth-child(2) { animation-delay: 0.2s; }
     .logai-dots span:nth-child(3) { animation-delay: 0.4s; }
     
