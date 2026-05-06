@@ -98,11 +98,11 @@ async function loadChatHistory() {
                 // Если ответа нет и статус pending, показываем автоответ и запускаем поллинг
                 else if (msg.status === 'pending') {
                     // Только если ещё нет активного поллинга на это сообщение
-                    if (activeMessageId !== msg.message_id) {
+                    if (!activeMessageId) { 
                         const aiMsg = addLogMsg('🤖 ИИ думает, подождите немного...', true);
                         activeMessageId = msg.message_id;
                         isWaiting = true; // блокируем ввод, пока реально идёт ответ
-                        startPolling(msg.message_id, aiMsg); // отдельная функция поллинга
+                        startPolling(msg.message_id, aiMsg); // запускаем поллинг
                     }
                 }
             }
@@ -116,8 +116,7 @@ async function loadChatHistory() {
         console.error('History error:', e); 
     }
 }
-
-// Вынесем общий поллинг для reuse
+    
 function startPolling(messageId, aiMsg) {
     const dotsEl = aiMsg.querySelector('.logai-dots');
     let startTime = Date.now();
