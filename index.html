@@ -79,28 +79,39 @@
         return d;
     } // Конец функции addLogMsg
 
-    async function loadChatHistory() {
-        const box = document.getElementById('logai-msgs');
-        box.innerHTML = '';
-        try {
-            const res = await fetch(`${API_URL}/history/${logSid}`);
-            const data = await res.json();
-            
-            if (Array.isArray(data) && data.length > 0) {
-                data.forEach(msg => {
-                    if (msg.message) addLogMsg(msg.message, false);
-                    if (msg.answer) addLogMsg(msg.answer, true);
-                });
-            } else {
-                // ПРИВЕТСТВИЕ ДЛЯ НОВОГО ЮЗЕРА
-                addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем я могу вам помочь?", true);
-            }
-            
-            historyLoaded = true; 
-        } catch (e) { 
-            console.error('History error:', e); 
+async function loadChatHistory() {
+    const box = document.getElementById('logai-msgs');
+    box.innerHTML = '';
+    try {
+        const res = await fetch(`${API_URL}/history/${logSid}?platform=site`);
+        const data = await res.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach(msg => {
+                // Добавляем пользовательское сообщение
+                if (msg.message) addLogMsg(msg.message, false);
+
+                // Добавляем ответ бота
+                if (msg.answer) {
+                    addLogMsg(msg.answer, true);
+                } 
+                // Если ответ ещё не пришёл, показываем автоответ "ИИ думает..."
+                else if (msg.status === 'pending') {
+                    const aiMsg = addLogMsg('🤖 ИИ думает, подождите немного...', true);
+                    activeMessageId = msg.message_id; // чтобы продолжить поллинг после обновления страницы
+                    // Можно сохранить ссылку на элемент для обновления текста через poll
+                }
+            });
+        } else {
+            // Приветствие для нового пользователя
+            addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем я могу вам помочь?", true);
         }
-    } // Конец функции loadChatHistory
+        
+        historyLoaded = true; 
+    } catch (e) { 
+        console.error('History error:', e); 
+    }
+} // Конец функции loadChatHistory
 
     async function sendLogAI() {
         if (isWaiting) return;
