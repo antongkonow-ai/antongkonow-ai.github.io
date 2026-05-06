@@ -87,112 +87,88 @@ async function loadChatHistory() {
         const data = await res.json();
         
         if (Array.isArray(data) && data.length > 0) {
-            data.forEach(msg => {
-                // Добавляем пользовательское сообщение
+            for (const msg of data) {
+                // Показываем пользовательское сообщение
                 if (msg.message) addLogMsg(msg.message, false);
 
-                // Добавляем ответ бота
+                // Показываем ответ бота, если есть
                 if (msg.answer) {
                     addLogMsg(msg.answer, true);
                 } 
-                // Если ответ ещё не пришёл, показываем автоответ "ИИ думает..."
+                // Если ответ ещё не пришёл, показываем автоответ "ИИ думает..." и запускаем поллинг
                 else if (msg.status === 'pending') {
                     const aiMsg = addLogMsg('🤖 ИИ думает, подождите немного...', true);
-                    activeMessageId = msg.message_id; // чтобы продолжить поллинг после обновления страницы
-                    // Можно сохранить ссылку на элемент для обновления текста через poll
+                    activeMessageId = msg.message_id;
+                    isWaiting = true; // блокируем ввод
+                    startPolling(msg.message_id, aiMsg); // отдельная функция поллинга
                 }
-            });
+            }
         } else {
             // Приветствие для нового пользователя
             addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем я могу вам помочь?", true);
         }
-        
+
         historyLoaded = true; 
     } catch (e) { 
         console.error('History error:', e); 
     }
-} // Конец функции loadChatHistory
+}
 
-    async function sendLogAI() {
-        if (isWaiting) return;
-        const el = document.getElementById('logai-input');
-        const btn = document.getElementById('logai-send-btn');
-        const msg = el.value.trim();
-        if (!msg) return;
+// Вынесем общий поллинг для reuse
+function startPolling(messageId, aiMsg) {
+    const dotsEl = aiMsg.querySelector('.logai-dots');
+    let startTime = Date.now();
+    let interval = 3000;
+    pollController = new AbortController();
 
-        isWaiting = true;
-        stopPolling();
+    const poll = async () => {
+        if (activeMessageId !== messageId) return;
+        const elapsed = (Date.now() - startTime) / 1000;
 
-        if(el) { el.disabled = true; el.style.opacity = '0.5'; }
-        if(btn) { btn.style.opacity = '0.5'; }
-        el.value = '';
-        addLogMsg(msg, false);
+        if (elapsed > 900) { finish('ИИ не ответил. Попробуйте позже.', aiMsg); return; }
 
         try {
-            const res = await fetch(`${API_URL}/send`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId: logSid, message: msg, clientId: 'client_arhitektor' })
+            const r = await fetch(`${API_URL}/get-answer/${messageId}`, {
+                signal: pollController.signal
             });
-            const data = await res.json();
-            
-            if (data.messageId) {
-                activeMessageId = data.messageId;
-                pollController = new AbortController();
-                
-                const aiMsg = addLogMsg('dots', true);
-                const dotsEl = aiMsg.querySelector('.logai-dots');
-                let startTime = Date.now();
-                let interval = 3000; 
+            const d = await r.json();
 
-                const poll = async () => {
-                    if (activeMessageId !== data.messageId) return;
-                    const elapsed = (Date.now() - startTime) / 1000;
-                    if (elapsed > 900) { finish('ИИ не ответил. Попробуйте позже.', aiMsg); return; }
-
-                    try {
-                        const r = await fetch(`${API_URL}/get-answer/${data.messageId}`, {
-                            signal: pollController.signal
-                        });
-                        const d = await r.json();
-
-                        if (d.answer) {
-                            finish(d.answer, aiMsg);
-                            return; 
-                        }
-
-                        if (elapsed > 60 && elapsed <= 180 && dotsEl && dotsEl.getAttribute('data-status') === 'pending') {
-                            dotsEl.setAttribute('data-status', 'thinking');
-                            aiMsg.innerText = 'Вопрос сложный, думаю...';
-                        }
-                        else if (elapsed > 180 && dotsEl && dotsEl.getAttribute('data-status') !== 'delayed') {
-                            dotsEl.setAttribute('data-status', 'delayed');
-                            aiMsg.innerText = 'Обрабатываю запрос...';
-                            interval = 20000;
-                        }
-
-                        pollTimeoutId = setTimeout(poll, interval);
-                    } catch (e) {
-                        if (e.name === 'AbortError') return;
-                        pollTimeoutId = setTimeout(poll, interval);
-                    }
-                };
-                poll();
+            if (d.answer) {
+                finish(d.answer, aiMsg);
+                return; 
             }
-        } catch (e) { finish('Ошибка связи.', null); }
+
+            // Меняем автоответ по времени
+            if (elapsed > 60 && elapsed <= 180 && dotsEl && dotsEl.getAttribute('data-status') === 'pending') {
+                dotsEl.setAttribute('data-status', 'thinking');
+                aiMsg.innerText = 'Вопрос сложный, думаю...';
+            } else if (elapsed > 180 && dotsEl && dotsEl.getAttribute('data-status') !== 'delayed') {
+                dotsEl.setAttribute('data-status', 'delayed');
+                aiMsg.innerText = 'Обрабатываю запрос...';
+                interval = 20000;
+            }
+
+            pollTimeoutId = setTimeout(poll, interval);
+        } catch (e) {
+            if (e.name === 'AbortError') return;
+            pollTimeoutId = setTimeout(poll, interval);
+        }
+    };
+
+    poll();
+} // <-- закрываем только startPolling()
+
+function finish(text, msgElement) {
+    const el = document.getElementById('logai-input');
+    const btn = document.getElementById('logai-send-btn');
+    if(el) { el.disabled = false; el.style.opacity = '1'; }
+    if(btn) { btn.style.opacity = '1'; }
+
+    if (msgElement) {
+        msgElement.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
+    } else {
+        addLogMsg(text, true);
     }
 
-    function finish(text, msgElement) {
-        const el = document.getElementById('logai-input');
-        const btn = document.getElementById('logai-send-btn');
-        if(el) { el.disabled = false; el.style.opacity = '1'; }
-        if(btn) { btn.style.opacity = '1'; }
-        
-        if (msgElement) {
-            msgElement.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
-        } else {
-            addLogMsg(text, true);
-        }
-        
-        stopPolling();
-    }</script></body></html>
+    stopPolling();
+}</script></body></html>
