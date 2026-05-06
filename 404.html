@@ -91,16 +91,19 @@ async function loadChatHistory() {
                 // Показываем пользовательское сообщение
                 if (msg.message) addLogMsg(msg.message, false);
 
-                // Показываем ответ бота, если есть
+                // Показываем ответ бота, если он уже есть
                 if (msg.answer) {
                     addLogMsg(msg.answer, true);
                 } 
-                // Если ответ ещё не пришёл, показываем автоответ "ИИ думает..." и запускаем поллинг
+                // Если ответа нет и статус pending, показываем автоответ и запускаем поллинг
                 else if (msg.status === 'pending') {
-                    const aiMsg = addLogMsg('🤖 ИИ думает, подождите немного...', true);
-                    activeMessageId = msg.message_id;
-                    isWaiting = true; // блокируем ввод
-                    startPolling(msg.message_id, aiMsg); // отдельная функция поллинга
+                    // Только если ещё нет активного поллинга на это сообщение
+                    if (activeMessageId !== msg.message_id) {
+                        const aiMsg = addLogMsg('🤖 ИИ думает, подождите немного...', true);
+                        activeMessageId = msg.message_id;
+                        isWaiting = true; // блокируем ввод, пока реально идёт ответ
+                        startPolling(msg.message_id, aiMsg); // отдельная функция поллинга
+                    }
                 }
             }
         } else {
