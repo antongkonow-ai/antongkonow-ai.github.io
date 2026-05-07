@@ -278,7 +278,7 @@ function finish(text, msgElement) {
         
         try {
             // ВСЕГДА полный путь к твоему серверу
-            const audio = new Audio('https://api.log-ai.ru/notify.mp3?' + Date.now());
+            const audio = new Audio('https://api.log-ai.ru/notify.mp3?v=' + Date.now());
             audio.volume = 0.4;
             audio.play().catch(e => console.log("Нужен клик"));
         } catch (e) {}
