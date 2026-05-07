@@ -278,7 +278,7 @@ function finish(text, msgElement) {
         
         // Звук уведомления (внешняя ссылка)
         try {
-            const audio = new Audio('https://soundjay.com/buttons/sounds/button-20.mp3');
+            const audio = new Audio('/notify.mp3');
             audio.volume = 0.4; // Громкость 40%
             audio.play().catch(e => console.log("Браузер ждет клика для звука"));
         } catch (e) {
