@@ -276,17 +276,16 @@ function finish(text, msgElement) {
     if (msgElement) {
         msgElement.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
         
-        // Звук уведомления (внешняя ссылка)
         try {
-            const audio = new Audio('/notify.mp3');
-            audio.volume = 0.4; // Громкость 40%
-            audio.play().catch(e => console.log("Браузер ждет клика для звука"));
-        } catch (e) {
-            // Если ссылка не сработала, чат просто промолчит
-        }
+            // ВСЕГДА полный путь к твоему серверу
+            const audio = new Audio('https://log-ai.ru/notify.mp3?' + Date.now());
+            audio.volume = 0.4;
+            audio.play().catch(e => console.log("Нужен клик"));
+        } catch (e) {}
     }
     stopPolling();
 }
+
 
 
     // Enter для отправки
