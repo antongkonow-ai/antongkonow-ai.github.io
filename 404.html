@@ -71,17 +71,28 @@
     let pollTimeoutId = null;
 
 
-    function toggleLogAI() {
+       function toggleLogAI() {
         const w = document.getElementById('logai-window');
-        const isOpen = (w.style.display === 'none' || w.style.display === '');
+        const isOpen = (window.getComputedStyle(w).display === 'none');
+        
         if (isOpen) {
             w.style.display = 'flex';
-            if (!historyLoaded) loadChatHistory();
+            if (!historyLoaded) {
+                loadChatHistory();
+            } 
+            // Если чат в режиме ожидания (точки), пинаем сервер сразу при открытии
+            else if (chatIsWaiting && activeMessageId) {
+                const dotsContainer = document.querySelector('.logai-dots')?.parentElement;
+                if (dotsContainer) {
+                    startPolling(activeMessageId, dotsContainer);
+                }
+            }
         } else {
             w.style.display = 'none';
-            stopPolling();
+            // УБРАЛИ stopPolling(), чтобы ИИ докачивал ответ, даже когда окно закрыто
         }
     }
+
 
     function updateInputState() {
         const input = document.getElementById('logai-input');
