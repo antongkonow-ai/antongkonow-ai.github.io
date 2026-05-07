@@ -241,7 +241,10 @@
             let nextInterval = (elapsed > 50) ? 10000 : 3000;
 
             try {
-                const r = await fetch(`${API_URL}/get-answer/${messageId}`, { signal: pollController.signal });
+                // Добавили ?t=... чтобы телефон каждый раз реально спрашивал сервер, а не брал из кэша
+                const r = await fetch(`${API_URL}/get-answer/${messageId}?t=${Date.now()}`, { 
+                    signal: pollController.signal 
+                });
                 const d = await r.json();
 
                 if (d.answer) {
