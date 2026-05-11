@@ -271,7 +271,7 @@
 
             try {
                 // Добавили ?t=... чтобы телефон каждый раз реально спрашивал сервер, а не брал из кэша
-                const r = await fetch(`${API_URL}/get-answer/${messageId}?t=${Date.now()}`, { 
+                const r = await fetch(`${API_URL}/get-answer/${messageId}?sessionId=${logSid}&clientId=client_arhitektor&t=${Date.now()}`, {
                     signal: pollController.signal 
                 });
                 const d = await r.json();
