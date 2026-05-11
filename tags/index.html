@@ -154,7 +154,7 @@
  async function loadChatHistory() {
     const box = document.getElementById('logai-msgs');
     try {
-        const res = await fetch(`${API_URL}/history/${logSid}?platform=site`);
+        const res = await fetch(`${API_URL}/history/${logSid}?platform=site&clientId=client_arhitektor`);
         const data = await res.json();
 
         box.innerHTML = '';
