@@ -156,8 +156,8 @@
 
         box.innerHTML = '';
 
-        if (Array.isArray(data) && data.length > 0) {
-            data.forEach((m, index) => {
+        if (Array.isArray(data.items) && data.items.length > 0) {
+            data.items.forEach((m, index) => {
                 // 1. Показываем сообщение пользователя
                 if (m.message) {
                     addLogMsg(m.message, false);
@@ -273,9 +273,10 @@
                     signal: pollController.signal 
                 });
                 const d = await r.json();
+                const finalAnswer = d.answer || (d.status !== 'pending' ? d.answer : null);
 
-                if (d.answer) {
-                    finish(d.answer, aiMsg);
+                if (finalAnswer) {
+                    finish(finalAnswer, aiMsg);
                 } else {
                     pollTimeoutId = setTimeout(poll, nextInterval);
                 }
