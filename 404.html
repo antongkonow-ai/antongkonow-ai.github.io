@@ -137,10 +137,14 @@
                          : 'align-self:flex-end; background:#007bff; color:white; border-bottom-right-radius:4px; box-shadow:0 4px 12px rgba(0,123,255,0.25);'}`;
 
         if (txt === 'dots') {
-            d.innerHTML = '<div class="logai-dots"><span></span><span></span><span></span></div>';
-        } else {
-            d.innerHTML = typeof marked !== 'undefined' ? marked.parse(txt) : txt;
-        }
+   // ИСПРАВЛЕНО: Добавлен явный текст ожидания рядом с анимацией точек для лучшего UX
+   d.innerHTML = '<div style="display:flex; align-items:center; gap:8px;">' +
+                 '<span style="font-style:italic; opacity:0.8;">ИИ подбирает ответ...</span>' +
+                 '<div class="logai-dots"><span></span><span></span><span></span></div>' +
+                 '</div>';
+ } else {
+   d.innerHTML = typeof marked !== 'undefined' ? marked.parse(txt) : txt;
+ }
 
         const box = document.getElementById('logai-msgs');
         box.appendChild(d);
@@ -148,13 +152,14 @@
         return d;
     }
 
- async function loadChatHistory() {
+async function loadChatHistory() {
     const box = document.getElementById('logai-msgs');
     try {
+        // УЛУЧШЕНО: Очищаем окно чата СРАЗУ, чтобы юзер не видел старый мусор, пока идет загрузка по сети
+        box.innerHTML = '';
+
         const res = await fetch(`${API_URL}/history/${logSid}?platform=site&clientId=${MY_CLIENT_ID}`);
         const data = await res.json();
-
-        box.innerHTML = '';
 
         if (Array.isArray(data.items) && data.items.length > 0) {
             data.items.forEach((m, index) => {
@@ -188,57 +193,72 @@
         addLogMsg("Не удалось загрузить историю чата", true);
     }
 }
-    async function sendLogAI() {
-        if (chatIsWaiting) return;
 
-        const input = document.getElementById('logai-input');
-        const msg = input.value.trim();
-        if (!msg) return;
+async function sendLogAI() {
+    if (chatIsWaiting) return;
 
-        chatIsWaiting = true;
-        updateInputState();
+    const input = document.getElementById('logai-input');
+    const msg = input.value.trim();
+    if (!msg) return;
 
-        addLogMsg(msg, false);
-        
-        // --- ВОТ ЭТИ ДВЕ СТРОКИ НУЖНО ДОБАВИТЬ ---
-        input.value = ''; 
-        input.style.height = 'auto'; 
-        // ---------------------------------------
+    // ЖЕЛЕЗНЫЙ ДЕБАУНС: блокируем повторный клик в первую же микросекунду
+    chatIsWaiting = true;
+    updateInputState();
 
-        const aiMsg = addLogMsg('dots', true);
+    addLogMsg(msg, false);
+    
+    input.value = ''; 
+    input.style.height = 'auto'; 
 
-        try {
-            const res = await fetch(`${API_URL}/send`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    sessionId: logSid,
-                    message: msg,
-                    clientId: MY_CLIENT_ID,
-                    platform: 'site',
-                    botPath: MY_BOT_PATH
-                })
-            });
+    const aiMsg = addLogMsg('dots', true);
 
+    try {
+        const res = await fetch(`${API_URL}/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId: logSid,
+                message: msg,
+                clientId: MY_CLIENT_ID,
+                platform: 'site',
+                botPath: MY_BOT_PATH
+            })
+        });
 
-            const data = await res.json();
-
-            if (data.blocked) {
-                finish(data.message || "Сообщение заблокировано", aiMsg);
-                return;
+        // ИСПРАВЛЕНО: Обработка HTTP-ошибок. Передаем false третьим параметром, чтобы не было звука при ошибке
+        if (!res.ok) {
+            let errorMsg = "⚠️ Сервер временно недоступен";
+            if (res.status === 429) errorMsg = "🚫 Слишком много запросов. Подождите немного.";
+            else if (res.status === 403) {
+                try {
+                    const errData = await res.json();
+                    errorMsg = errData.reason || "🚫 Доступ ограничен.";
+                } catch (_) {
+                    errorMsg = "🚫 Доступ ограничен.";
+                }
             }
-
-            if (data.messageId) {
-                activeMessageId = data.messageId;
-                startPolling(data.messageId, aiMsg);
-            } else {
-                finish("Ошибка сервера", aiMsg);
-            }
-        } catch (e) {
-            finish("Ошибка связи с сервером", aiMsg);
+            finish(errorMsg, aiMsg, false); // false — звук НЕ играет
+            return;
         }
-    }
 
+        const data = await res.json();
+
+        if (data.blocked) {
+            finish(data.reason || data.message || "🚫 Сообщение заблокировано", aiMsg, false); // false — без звука
+            return;
+        }
+
+        if (data.messageId) {
+            activeMessageId = data.messageId;
+            startPolling(data.messageId, aiMsg);
+        } else {
+            finish("⚠️ Ошибка регистрации сообщения (нет messageId)", aiMsg, false);
+        }
+    } catch (e) {
+        console.error(e);
+        finish("⚠️ Ошибка связи с сервером. Проверьте интернет.", aiMsg, false);
+    }
+} // Скобка закрывает саму функцию send
     function startPolling(messageId, aiMsg) {
         activeMessageId = messageId;
         pollController = new AbortController();
@@ -289,31 +309,40 @@
         poll();
     }
 
-function finish(text, msgElement) {
+function finish(text, msgElement, isSuccess = true) {
     if (msgElement) {
         msgElement.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
         
-        try {
-            // ВСЕГДА полный путь к твоему серверу
-            const audio = new Audio('https://api.log-ai.ru/notify.mp3?v=' + Date.now());
-            audio.volume = 0.4;
-            audio.play().catch(e => console.log("Нужен клик"));
-        } catch (e) {}
+        // Звук играет строго при успешном ответе ИИ, при ошибках или банах — тишина
+        if (isSuccess) {
+            try {
+                // ТВОЙ ОРИГИНАЛЬНЫЙ РАБОЧИЙ ПУТЬ: Кэш сбрасывается, файл проигрывается без ошибок 404
+                const audio = new Audio('https://api.log-ai.ru/notify.mp3?v=' + Date.now());
+                audio.volume = 0.4;
+                audio.play().catch(e => console.log("Нужен клик"));
+            } catch (e) {}
+        }
     }
     stopPolling();
 }
 
 
-
     // Enter для отправки
     document.addEventListener('DOMContentLoaded', () => {
-        const input = document.getElementById('logai-input');
-        if (input) {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendLogAI();
-                }
-            });
+    const input = document.getElementById('logai-input');
+    if (input) {
+      input.addEventListener('keypress', (e) => {
+        // ИСПРАВЛЕНО: Добавлена проверка !chatIsWaiting, чтобы клавиатура намертво блокировалась во время ожидания ИИ
+        if (e.key === 'Enter' && !e.shiftKey && !chatIsWaiting) {
+          e.preventDefault();
+          sendLogAI();
         }
+      });
+
+      // ИСПРАВЛЕНО: Текстовое поле плавно растёт вниз до 150px, если текст длинный
+      input.addEventListener('input', function() {
+        this.style.height = 'auto'; 
+        this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+      });
+    }
     });</script></body></html>
