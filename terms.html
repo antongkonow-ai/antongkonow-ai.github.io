@@ -155,7 +155,6 @@
 async function loadChatHistory() {
     const box = document.getElementById('logai-msgs');
     try {
-        // УЛУЧШЕНО: Очищаем окно чата СРАЗУ, чтобы юзер не видел старый мусор, пока идет загрузка по сети
         box.innerHTML = '';
 
         const res = await fetch(`${API_URL}/history/${logSid}?platform=site&clientId=${MY_CLIENT_ID}`);
@@ -172,10 +171,10 @@ async function loadChatHistory() {
                 if (m.answer) {
                     addLogMsg(m.answer, true);
                 } 
-                // 3. Если это ПОСЛЕДНЕЕ сообщение и ответа нет — включаем ожидание
+                // 3. ИСПРАВЛЕНО: Четкое чтение m.message_id из базы данных без путаницы с регистрами
                 else if (m.message_id && index === data.items.length - 1) {
                     chatIsWaiting = true;
-                    activeMessageId = m.message_id;
+                    activeMessageId = m.message_id; // Используем m.message_id
                     
                     const aiMsg = addLogMsg('dots', true);
                     startPolling(m.message_id, aiMsg); 
@@ -193,6 +192,7 @@ async function loadChatHistory() {
         addLogMsg("Не удалось загрузить историю чата", true);
     }
 }
+
 
 async function sendLogAI() {
     if (chatIsWaiting) return;
