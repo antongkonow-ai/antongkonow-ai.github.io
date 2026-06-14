@@ -254,7 +254,7 @@
                     addLogMsg(m.answer, true);
                 } 
                 // 3. Если это ПОСЛЕДНЕЕ сообщение и ответа нет — включаем ожидание
-                else if (m.message_id && index === data.length - 1) {
+                else if (m.message_id && index === data.items.length - 1) {
                     chatIsWaiting = true;
                     activeMessageId = m.message_id;
                     
