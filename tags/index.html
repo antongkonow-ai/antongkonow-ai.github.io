@@ -120,9 +120,10 @@
     }
 
     function stopPolling() {
+        if (activeMessageId) localStorage.removeItem('poll_start_' + activeMessageId);
         if (pollController) pollController.abort();
         if (pollTimeoutId) clearTimeout(pollTimeoutId);
-        
+    
         pollController = null;
         pollTimeoutId = null;
         activeMessageId = null;
@@ -262,7 +263,12 @@ async function sendLogAI() {
     function startPolling(messageId, aiMsg) {
         activeMessageId = messageId;
         pollController = new AbortController();
-        let startTime = Date.now();
+        let savedTime = localStorage.getItem('poll_start_' + messageId);
+        if (!savedTime) {
+            savedTime = Date.now().toString();
+            localStorage.setItem('poll_start_' + messageId, savedTime);
+        }
+        let startTime = parseInt(savedTime, 10);
         let statusChanged = false; // Чтобы не менять текст постоянно
 
         const poll = async () => {
