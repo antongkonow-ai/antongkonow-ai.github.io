@@ -351,4 +351,14 @@ function finish(text, msgElement, isSuccess = true) {
         this.style.height = Math.min(this.scrollHeight, 150) + 'px';
       });
     }
-    });</script></body></html>
+    });</script><div id="cookie-notice-wrapper" style="position: fixed; bottom: 0; left: 0; width: 100%; background: #111111; border-top: 1px solid #222222; padding: 12px 20px; box-sizing: border-box; z-index: 99999; display: none; justify-content: space-between; align-items: center; gap: 20px; font-family: sans-serif;"><span style="color: #888888; font-size: 12px; line-height: 1.4; text-align: left;">Наш сайт использует файлы cookie для анализа трафика. Находясь здесь, вы соглашаетесь с нашей <a href="privacy-policy.html" style="color: #bfa15f; text-decoration: underline;">Политикой конфиденциальности</a>. </span><button onclick="dismissCookieNotice()" style="background: #bfa15f; color: #000000; border: none; padding: 6px 16px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: opacity 0.2s; white-space: nowrap;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Принять</button></div><script>(function() {
+        var storageKey = 'logai_cookies_accepted';
+        if (!localStorage.getItem(storageKey)) {
+            document.getElementById('cookie-notice-wrapper').style.display = 'flex';
+        }
+    })();
+
+    function dismissCookieNotice() {
+        localStorage.setItem('logai_cookies_accepted', 'true');
+        document.getElementById('cookie-notice-wrapper').style.display = 'none';
+    }</script></body></html>
