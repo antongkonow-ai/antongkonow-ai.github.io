@@ -9,96 +9,67 @@
                     this.classList.add('is-loaded');
                 }, false);
             }
-        }</script><style>/* Анимации точек загрузки ИИ */
-    @keyframes logai-bounce { 
-        0%, 80%, 100% { transform: translateY(0); } 
-        40% { transform: translateY(-5px); } 
-    }
+        }</script><style>/* Анимации и точки */
+    @keyframes logai-bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
     .logai-dots { display: flex !important; flex-direction: row !important; gap: 4px !important; align-items: center !important; height: 12px !important; }
     .logai-dots span { display: inline-block; width: 5px; height: 5px; background: #aaa !important; border-radius: 50%; animation: logai-bounce 1.4s infinite ease-in-out; }
     .logai-dots span:nth-child(2) { animation-delay: 0.2s; }
     .logai-dots span:nth-child(3) { animation-delay: 0.4s; }
     
-    /* Скроллбар чата */
     #logai-msgs::-webkit-scrollbar { width: 5px; }
-    #logai-msgs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+    #logai-msgs::-webkit-scrollbar-thumb { background: #666; border-radius: 10px; }
     
-    /* Сообщения и контейнер текста */
+    /* Сообщения и текст */
     #logai-msgs div { white-space: pre-wrap !important; word-wrap: break-word !important; padding: 12px 16px !important; margin-bottom: 5px !important; display: flex; flex-direction: column; justify-content: center; }
     #logai-msgs div p { margin: 0 !important; padding: 0 !important; line-height: 1.5 !important; }
-    #logai-msgs { gap: 12px !important; padding: 20px !important; background: #3b3e45 !important; }
+    #logai-msgs { gap: 12px !important; padding: 20px !important; }
 
-    /* Системное поле ввода и кнопка отправки */
-    #logai-input { flex: 1 !important; padding: 12px 18px !important; border-radius: 20px !important; background: #4a4e56 !important; border: 1px solid rgba(255,255,255,0.1) !important; outline: none !important; color: #fff !important; font-size: 15px !important; resize: none !important; max-height: 120px !important; line-height: 1.4 !important; font-family: sans-serif; }
-    #logai-send-btn { background-color: #007bff !important; border: none !important; width: 45px !important; height: 45px !important; border-radius: 50% !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; color: white !important; font-size: 20px !important; padding: 0 !important; flex-shrink: 0 !important; transition: background 0.2s ease; }
-    #logai-send-btn:hover { background-color: #0056b3 !important; }
+    /* Поле ввода и кнопка отправить */
+    #logai-input { flex: 1 !important; padding: 12px 18px !important; border-radius: 20px !important; background: #4a4e56 !important; border: 1px solid rgba(255,255,255,0.1) !important; outline: none !important; color: #fff !important; font-size: 15px !important; resize: none !important; max-height: 120px !important; line-height: 1.4 !important; }
+    #logai-send-btn { background-color: #007bff !important; border: none !important; width: 45px !important; height: 45px !important; border-radius: 50% !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; color: white !important; font-size: 24px !important; padding: 0 !important; flex-shrink: 0 !important; }
 
-    /* ГЛАВНАЯ КНОПКА ВЫЗОВА ВИДЖЕТА */
+    /* ТВОИ РОДНЫЕ КООРДИНАТЫ КНОПКИ И ОКНА НА ПК */
     #logai-btn {
-        position: fixed !important; bottom: 40px !important; right: 40px !important;
-        width: 60px !important; height: 60px !important; border-radius: 50% !important;
+        position: fixed !important; bottom: 40px !important; right: 110px !important;
+        width: 65px !important; height: 65px !important; border-radius: 50% !important;
         background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
-        cursor: pointer !important; z-index: 100000 !important; box-shadow: 0 8px 24px rgba(0,123,255,0.35);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer !important; z-index: 10000 !important; box-shadow: 0 10px 25px rgba(0,123,255,0.4);
     }
-    #logai-btn:hover { transform: scale(1.05); }
 
-    /* ДОРОГОЕ ДЕСКТОПНОЕ ОКНО ЧАТА */
     #logai-window {
-        display: none; position: fixed !important; bottom: 115px !important; right: 40px !important;
+        display: none; position: fixed !important; bottom: 115px !important; right: 110px !important;
         width: 380px !important; height: 600px !important; background: #3b3e45 !important;
         border-radius: 24px !important; flex-direction: column; overflow: hidden;
-        z-index: 100000 !important; box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-        border: 1px solid rgba(255,255,255,0.12) !important;
-        transform: translateY(20px); opacity: 0;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+        z-index: 10000 !important; box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        border: 1px solid rgba(255,255,255,0.15) !important;
     }
 
-    /* Когда чат открыт — добавляем этот класс через JS для плавной анимации */
-    #logai-window.logai-active {
-        display: flex !important; transform: translateY(0); opacity: 1;
-    }
-
-    /* ИДЕАЛЬНЫЙ СУПЕР-АДАПТИВ ДЛЯ МОБИЛОК (БЕЗ КОНФЛИКТОВ) */
+    /* ЖЕСТКИЙ АДАПТИВ ДЛЯ МОБИЛОК (ОКНО НЕ СЪЕДЕТ ЗА ЭКРАН) */
     @media screen and (max-width: 480px) {
-        #logai-widget-container { bottom: 0 !important; right: 0 !important; left: 0 !important; width: 100% !important; }
+        #logai-widget {
+            right: 0 !important; bottom: 0 !important; left: 0 !important; width: 100% !important;
+        }
         
         #logai-window { 
-            right: 0 !important; bottom: 0 !important; left: 0 !important; 
+            right: 0 !important; 
+            left: 0 !important; 
+            bottom: 0 !important; 
             width: 100% !important; 
-            height: 100dvh !important; /* Динамическая высота спасает от багов Safari на iOS */
+            max-width: 100vw !important;
+            height: 100dvh !important;
             border-radius: 0 !important; 
             border: none !important;
+            box-sizing: border-box !important;
+            z-index: 999999 !important; 
         }
+        
         #logai-btn { 
-            bottom: 25px !important; right: 25px !important; 
+            bottom: 80px !important; 
+            right: 22px !important;  
+            z-index: 999998 !important; 
         }
-        /* Скрываем кнопку вызова на мобилке, когда чат открыт, чтобы не мешалась */
-        #logai-window.logai-active ~ #logai-btn {
-            display: none !important;
-        }
-    }</style><div id="logai-widget-container" style="position: fixed; bottom: 0; right: 0; z-index: 999999;"><div id="logai-window"><div style="background: #2d3035; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;"><div style="display: flex; align-items: center; gap: 12px;"><div style="width: 34px; height: 35px; background: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(0,123,255,0.45);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg></div><span style="font-weight: 600; color: #fff; font-size: 15px; letter-spacing: 0.3px; font-family: sans-serif;">AI Ассистент</span></div><div onclick="toggleLogAI()" style="cursor: pointer; color: #fff; font-size: 28px; line-height: 1; opacity: 0.6; padding: 4px 8px; transition: opacity 0.2s ease; font-family: sans-serif;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.6'">&times;</div></div><div id="logai-msgs" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column;"></div><div style="padding: 15px; background: #2d3035; display: flex; gap: 12px; align-items: flex-end; border-top: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; box-sizing: border-box;"><textarea id="logai-input" rows="1" placeholder="Напишите..." oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea> <button id="logai-send-btn" onclick="sendLogAI()">➤</button></div></div><div id="logai-btn" onclick="toggleLogAI()"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div></div><script>function toggleLogAI() {
-    const win = document.getElementById('logai-window');
-    if (!win) return;
-    
-    // Проверяем текущее состояние
-    if (win.style.display === 'none' || win.style.display === '') {
-      // 1. Сначала делаем блок видимым
-      win.style.display = 'flex';
-      // 2. Через микро-таймер вешаем класс анимации (чтобы сработал плавный вылет CSS)
-      setTimeout(function() {
-        win.classList.add('logai-active');
-      }, 10);
-    } else {
-      // Плавное закрытие
-      win.classList.remove('logai-active');
-      // Прячем из DOM-дерева только после завершения плавного исчезновения (400мс)
-      setTimeout(function() {
-        win.style.display = 'none';
-      }, 400);
-    }
-  }</script><script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script><script>const API_URL = 'https://api2.log-ai.ru';
+    }</style><div id="logai-widget" style="position: fixed; bottom: 0; right: 0; z-index: 9999;"><div id="logai-btn" onclick="toggleLogAI()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><div id="logai-window" style="box-sizing: border-box;"><div style="background: #2d3035; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; width: 100%;"><div style="display:flex; align-items:center; gap:12px;"><div style="width:35px; height:35px; background:#007bff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(0,123,255,0.5);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg></div><span style="font-weight:600; color:#fff; font-size:16px; letter-spacing: 0.5px; font-family: sans-serif;">AI Ассистент</span></div><span onclick="toggleLogAI()" style="cursor:pointer; color:#fff; font-size:35px; line-height: 0.7; opacity: 0.7; font-family: sans-serif; padding: 0 5px;">&times;</span></div><div id="logai-msgs" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; background:#3b3e45; box-sizing: border-box; width: 100%;"></div><div style="padding:15px; background:#2d3035; display:flex; gap:10px; align-items:flex-end; border-top: 1px solid rgba(255,255,255,0.1); box-sizing: border-box; width: 100%;"><textarea id="logai-input" rows="1" placeholder="Напишите..." oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea> <button id="logai-send-btn" onclick="sendLogAI()">➤</button></div></div></div><script src="https://jsdelivr.net"></script><script>const API_URL = 'https://log-ai.ru';
     const MY_CLIENT_ID = 'client_arhitektor_2'; // МЕНЯТЬ ТУТ
     const MY_BOT_PATH = 'arhitektor_2';  // МЕНЯТЬ ТУТ 
     
@@ -122,23 +93,13 @@
     let pollTimeoutId = null;
 
 
-    /* =========================================================
-       ИСПРАВЛЕННАЯ ФУНКЦИЯ УПРАВЛЕНИЯ ОКНОМ И КЛАССАМИ АНИМАЦИИ
-       ========================================================= */
+    /* ТВОЯ ОРИГИНАЛЬНАЯ ФУНКЦИЯ ОТКРЫТИЯ ОКНА (БЕЗ ИЗМЕНЕНИЙ ЛОГИКИ) */
     function toggleLogAI() {
         const w = document.getElementById('logai-window');
-        if (!w) return;
+        const isOpen = (window.getComputedStyle(w).display === 'none');
         
-        // Сверяем по классу, закрыто ли сейчас окно
-        const isClosed = !w.classList.contains('logai-active');
-        
-        if (isClosed) {
+        if (isOpen) {
             w.style.display = 'flex';
-            // Микротаймер, чтобы браузер успел применить flex перед запуском CSS-вылета
-            setTimeout(function() {
-                w.classList.add('logai-active');
-            }, 10);
-
             if (!historyLoaded) {
                 loadChatHistory();
             } 
@@ -150,11 +111,7 @@
                 }
             }
         } else {
-            w.classList.remove('logai-active');
-            // Ждем завершения анимации затухания (300мс) и только потом убираем display:flex
-            setTimeout(function() {
-                w.style.display = 'none';
-            }, 300);
+            w.style.display = 'none';
         }
     }
 
@@ -188,9 +145,8 @@
                          : 'align-self:flex-end; background:#007bff; color:white; border-bottom-right-radius:4px; box-shadow:0 4px 12px rgba(0,123,255,0.25);'}`;
 
         if (txt === 'dots') {
-            // ИСПРАВЛЕНО: Добавлен явный текст ожидания рядом с анимацией точек для лучшего UX
             d.innerHTML = '<div style="display:flex; align-items:center; gap:8px;">' +
-                          '<span style="font-style:italic; opacity:0.8; font-family:sans-serif;">ИИ подбирает ответ...</span>' +
+                          '<span style="font-style:italic; opacity:0.8;">ИИ подбирает ответ...</span>' +
                           '<div class="logai-dots"><span></span><span></span><span></span></div>' +
                           '</div>';
         } else {
@@ -203,48 +159,49 @@
         return d;
     }
 
-async function loadChatHistory() {
-    const box = document.getElementById('logai-msgs');
-    try {
-        box.innerHTML = '';
+    async function loadChatHistory() {
+        const box = document.getElementById('logai-msgs');
+        try {
+            box.innerHTML = '';
 
-        const res = await fetch(`${API_URL}/history/${logSid}?platform=site&clientId=${MY_CLIENT_ID}`);
-        const data = await res.json();
+            const res = await fetch(`${API_URL}/history/${logSid}?platform=site&clientId=${MY_CLIENT_ID}`);
+            const data = await res.json();
 
-        if (Array.isArray(data.items) && data.items.length > 0) {
-            data.items.forEach((m, index) => {
-                // 1. Показываем сообщение пользователя
-                if (m.message) {
-                    addLogMsg(m.message, false);
-                }
+            if (Array.isArray(data.items) && data.items.length > 0) {
+                data.items.forEach((m, index) => {
+                    // 1. Показываем сообщение пользователя
+                    if (m.message) {
+                        addLogMsg(m.message, false);
+                    }
 
-                // 2. Если есть готовый ответ — показываем
-                if (m.answer) {
-                    addLogMsg(m.answer, true);
-                } 
-                // 3. ИСПРАВЛЕНО: Четкое чтение m.message_id из базы данных без путаницы с регистрами
-                else if (m.message_id && index === data.items.length - 1) {
-                    chatIsWaiting = true;
-                    activeMessageId = m.message_id; // Используем m.message_id
-                    
-                    const aiMsg = addLogMsg('dots', true);
-                    startPolling(m.message_id, aiMsg); 
-                }
-            });
-        } else {
-            addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем могу помочь?", true);
+                    // 2. Если есть готовый ответ — показываем
+                    if (m.answer) {
+                        addLogMsg(m.answer, true);
+                    } 
+                    // 3. Четкое чтение m.message_id из базы данных без путаницы с регистрами
+                    else if (m.message_id && index === data.items.length - 1) {
+                        chatIsWaiting = true;
+                        activeMessageId = m.message_id; // Используем m.message_id
+                        
+                        const aiMsg = addLogMsg('dots', true);
+                        startPolling(m.message_id, aiMsg); 
+                    }
+                });
+            } else {
+                addLogMsg("Здравствуйте! Я ваш ИИ-ассистент. Чем могу помочь?", true);
+            }
+
+            historyLoaded = true;
+            updateInputState();
+
+        } catch (e) {
+            console.error('History error:', e);
+            addLogMsg("Не удалось загрузить историю чата", true);
         }
-
-        historyLoaded = true;
-        updateInputState();
-
-    } catch (e) {
-        console.error('History error:', e);
-        addLogMsg("Не удалось загрузить историю чата", true);
     }
-}
-
-
+<!-- ==========================================================
+     LOG-AI / WIDGET / ЧАСТЬ 3 ИЗ 3 (ОБРАБОТКА И КУКИ)
+     ========================================================== -->
 async function sendLogAI() {
     if (chatIsWaiting) return;
 
@@ -276,7 +233,7 @@ async function sendLogAI() {
             })
         });
 
-        // Обработка HTTP-ошибок
+        // Обработка HTTP-ошибок. Передаем false третьим параметром, чтобы не было звука при ошибке
         if (!res.ok) {
             let errorMsg = "⚠️ Сервер временно недоступен";
             if (res.status === 429) errorMsg = "🚫 Слишком много запросов. Подождите немного.";
@@ -295,7 +252,7 @@ async function sendLogAI() {
         const data = await res.json();
 
         if (data.blocked) {
-            finish(data.reason || data.message || "🚫 Сообщение заблокировано", aiMsg, false);
+            finish(data.reason || data.message || "🚫 Сообщение заблокировано", aiMsg, false); // false — без звука
             return;
         }
 
@@ -309,7 +266,7 @@ async function sendLogAI() {
         console.error(e);
         finish("⚠️ Ошибка связи с сервером. Проверьте интернет.", aiMsg, false);
     }
-}
+} // Скобка закрывает саму функцию send
 
 function startPolling(messageId, aiMsg) {
     activeMessageId = messageId;
@@ -320,13 +277,14 @@ function startPolling(messageId, aiMsg) {
         localStorage.setItem('poll_start_' + messageId, savedTime);
     }
     let startTime = parseInt(savedTime, 10);
-    let statusChanged = false;
+    let statusChanged = false; // Чтобы не менять текст постоянно
 
     const poll = async () => {
         if (activeMessageId !== messageId) return;
 
-        const elapsed = (Date.now() - startTime) / 1000;
+        const elapsed = (Date.now() - startTime) / 1000; // секунд прошло
 
+        // 1. На 40-й секунде меняем текст на "Сложный вопрос"
         if (elapsed > 40 && !statusChanged) {
             const dots = aiMsg.querySelector('.logai-dots');
             aiMsg.innerHTML = '🤖 Вопрос сложный, анализирую данные...';
@@ -334,14 +292,17 @@ function startPolling(messageId, aiMsg) {
             statusChanged = true;
         }
 
+        // 2. Лимит ожидания - 10 минут (600 секунд)
         if (elapsed > 600) {
             finish("🤖 Извините, ИИ перегружен или запрос слишком сложный. Пожалуйста, попробуйте позже.", aiMsg);
             return;
         }
 
+        // 3. Умный интервал: до 50 сек — каждые 3 сек, потом — каждые 10 сек
         let nextInterval = (elapsed > 50) ? 10000 : 3000;
 
         try {
+            // Добавили ?t=... чтобы телефон каждый раз реально спрашивал сервер, а не брал из кэша
             const r = await fetch(`${API_URL}/get-answer/${messageId}?sessionId=${logSid}&clientId=${MY_CLIENT_ID}&t=${Date.now()}`, {
                 signal: pollController.signal 
             });
@@ -366,9 +327,11 @@ function finish(text, msgElement, isSuccess = true) {
     if (msgElement) {
         msgElement.innerHTML = typeof marked !== 'undefined' ? marked.parse(text) : text;
         
+        // Звук играет строго при успешном ответе ИИ, при ошибках или банах — тишина
         if (isSuccess) {
             try {
-                const audio = new Audio('https://api.log-ai.ru/notify.mp3?v=' + Date.now());
+                // Кэш сбрасывается, файл проигрывается без ошибок 404
+                const audio = new Audio('https://log-ai.ru' + Date.now());
                 audio.volume = 0.4;
                 audio.play().catch(e => console.log("Нужен клик"));
             } catch (e) {}
@@ -377,23 +340,25 @@ function finish(text, msgElement, isSuccess = true) {
     stopPolling();
 }
 
-// ПРЯМОЕ НАЗНАЧЕНИЕ СОБЫТИЙ ДЛЯ ПОЛЯ ВВОДА (УБРАН ДУБЛИРУЮЩИЙ DOMCONTENTLOADED)
-(function() {
+// Enter для отправки
+document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('logai-input');
     if (input) {
-        input.addEventListener('keypress', function(e) {
+        input.addEventListener('keypress', (e) => {
+            // Добавлена проверка !chatIsWaiting, чтобы клавиатура намертво блокировалась во время ожидания ИИ
             if (e.key === 'Enter' && !e.shiftKey && !chatIsWaiting) {
                 e.preventDefault();
                 sendLogAI();
             }
         });
 
+        // Текстовое поле плавно растёт вниз до 150px, если текст длинный
         input.addEventListener('input', function() {
             this.style.height = 'auto'; 
             this.style.height = Math.min(this.scrollHeight, 150) + 'px';
         });
     }
-})();</script><div id="cookie-notice-wrapper" style="position: fixed; bottom: 0; left: 0; width: 100%; background: #111111; border-top: 1px solid #222222; padding: 10px 15px; box-sizing: border-box; z-index: 99999; display: none; flex-direction: row; justify-content: space-between; align-items: center; gap: 15px; font-family: sans-serif;"><span style="color: #888888; font-size: 12px; line-height: 1.4; text-align: left;">Наш сайт использует файлы cookie для анализа трафика. Находясь здесь, вы соглашаетесь с нашей <a href="privacy-policy.html" style="color: #bfa15f; text-decoration: underline;">Политикой конфиденциальности</a>. </span><button onclick="dismissCookieNotice()" style="background: #bfa15f; color: #000000; border: none; padding: 5px 14px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: opacity 0.2s; white-space: nowrap;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Принять</button></div><style>@media (max-width: 600px) {
+});</script><div id="cookie-notice-wrapper" style="position: fixed; bottom: 0; left: 0; width: 100%; background: #111111; border-top: 1px solid #222222; padding: 10px 15px; box-sizing: border-box; z-index: 99999; display: none; flex-direction: row; justify-content: space-between; align-items: center; gap: 15px; font-family: sans-serif;"><span style="color: #888888; font-size: 12px; line-height: 1.4; text-align: left;">Наш сайт использует файлы cookie для анализа трафика. Находясь здесь, вы соглашаетесь с нашей <a href="privacy-policy.html" style="color: #bfa15f; text-decoration: underline;">Политикой конфиденциальности</a>. </span><button onclick="dismissCookieNotice()" style="background: #bfa15f; color: #000000; border: none; padding: 5px 14px; font-size: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: opacity 0.2s; white-space: nowrap;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Принять</button></div><style>@media (max-width: 600px) {
         #cookie-notice-wrapper {
             flex-direction: column !important;
             text-align: center !important;
