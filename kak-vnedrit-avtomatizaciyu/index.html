@@ -38,10 +38,21 @@
     }
 
     window.addEventListener('wheel', function (event) {
-        // Не вмешиваемся в прокрутку внутри чат-бота
-        if (event.target.closest('#logai-window, #logai-msgs')) return;
 
-        event.preventDefault();
+    // Если глобус активирован кликом —
+    // колесо полностью отдаём Globe.gl для zoom.
+    const globe = event.target.closest('#globeViz');
+
+    if (globe && globe.dataset.interacting === 'true') {
+        return;
+    }
+
+    // Внутренний скролл AI-чата не трогаем
+    if (event.target.closest('#logai-window, #logai-msgs')) {
+        return;
+    }
+
+    event.preventDefault();
 
         let delta = event.deltaY * SPEED;
 
