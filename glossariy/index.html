@@ -553,4 +553,9 @@ function finish(text, msgElement, isSuccess = true) {
     function dismissCookieNotice() {
         localStorage.setItem('logai_cookies_accepted', 'true');
         document.getElementById('cookie-notice-wrapper').style.display = 'none';
-    }</script></body></html>
+    }</script><script>/* Плавный инерционный скролл страницы — только ПК */
+(function () {
+    if (window.matchMedia('(pointer: fine)').matches) {
+        // код плавного скролла здесь
+    }
+})();</script></body></html>
