@@ -28,17 +28,22 @@ SVX — Екатеринбург</pre></div></div><p style="font-size: 15px; col
             }
         }</script><script>(() => {
   const params = new URLSearchParams(window.location.search);
-
   if (params.get('mode') !== 'monument') return;
 
-  // Реальный адрес твоего MP3
-  const AUDIO_URL =
-    'https://log-ai.ru/media/files/interstellar.mp3';
+  const IMAGE_URL = 'https://log-ai.ru/media/files/Interstellar.jpeg';
+  const AUDIO_URL = 'https://log-ai.ru/media/files/interstellar.mp3';
+
+  // Защита от повторного запуска
+  if (document.getElementById('log-ai-monument')) return;
 
   const monument = document.createElement('div');
   monument.id = 'log-ai-monument';
 
   monument.innerHTML = `
+    <div class="monument-universe"></div>
+    <canvas class="monument-stars"></canvas>
+    <div class="monument-shade"></div>
+
     <div class="monument-frame">
       <p class="monument-overline">ARCHIVUM · LOG-AI · MMXXVI</p>
 
@@ -67,37 +72,80 @@ SVX — Екатеринбург</pre></div></div><p style="font-size: 15px; col
         LOG·AI·ARCHITECTI·MMXXVI
       </p>
 
-      <p id="monument-hint" class="monument-exit">
+      <p class="monument-exit" id="monument-hint">
         [ CLICK ANYWHERE TO RETURN ]
       </p>
     </div>
   `;
 
   const style = document.createElement('style');
-
   style.textContent = `
     #log-ai-monument {
       position: fixed;
       inset: 0;
       z-index: 2147483647;
+      overflow-x: hidden;
       overflow-y: auto;
-      background: #050505;
-      color: #d8d0c0;
+      background: #03040a;
+      color: #e5dfd3;
       display: grid;
       place-items: center;
       padding: 28px 18px;
       box-sizing: border-box;
       cursor: pointer;
+      isolation: isolate;
       opacity: 0;
-      animation: monument-appear 1.4s ease forwards;
+      animation: logai-monument-appear 1.8s ease forwards;
+    }
+
+    #log-ai-monument .monument-universe {
+      position: fixed;
+      inset: -3%;
+      z-index: -3;
+      background-image: url("https://log-ai.ru/media/files/Interstellar.jpeg");
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      transform: scale(1.02);
+      animation: logai-cosmic-drift 35s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    #log-ai-monument .monument-shade {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(ellipse at center,
+          rgba(0,0,0,.24) 0%,
+          rgba(0,0,0,.52) 65%,
+          rgba(0,0,0,.78) 100%),
+        linear-gradient(
+          to bottom,
+          rgba(0,0,0,.42),
+          rgba(0,0,0,.18) 45%,
+          rgba(0,0,0,.62)
+        );
+      pointer-events: none;
+    }
+
+    #log-ai-monument .monument-stars {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      pointer-events: none;
     }
 
     #log-ai-monument .monument-frame {
+      position: relative;
       width: 100%;
       max-width: 680px;
       text-align: center;
       font-family: Georgia, 'Times New Roman', serif;
       padding: 30px 0;
+      text-shadow: 0 2px 18px rgba(0,0,0,.9);
     }
 
     #log-ai-monument .monument-overline,
@@ -113,14 +161,21 @@ SVX — Екатеринбург</pre></div></div><p style="font-size: 15px; col
 
     #log-ai-monument .monument-overline,
     #log-ai-monument .monument-signature {
-      color: #9c8050;
+      color: #c0a16a;
     }
 
     #log-ai-monument .monument-rule {
       height: 1px;
-      max-width: 160px;
+      width: 160px;
+      max-width: 60%;
       margin: 30px auto;
-      background: #59472d;
+      background: linear-gradient(
+        to right,
+        transparent,
+        #a68a55,
+        transparent
+      );
+      box-shadow: 0 0 12px rgba(190,155,90,.2);
     }
 
     #log-ai-monument h1 {
@@ -129,27 +184,32 @@ SVX — Екатеринбург</pre></div></div><p style="font-size: 15px; col
       line-height: 1.5;
       letter-spacing: .16em;
       font-weight: 400;
+      color: #f4f0e8;
     }
 
     #log-ai-monument h1 span {
-      color: #b69a65;
+      color: #d2b77e;
     }
 
     #log-ai-monument .monument-translation {
-      color: #77716a;
+      color: #c0b8aa;
     }
 
     #log-ai-monument .monument-message {
       margin: 55px auto 38px;
       max-width: 490px;
-      color: #aaa49a;
+      color: #e0d9cd;
       font-size: 13px;
       line-height: 2.2;
       letter-spacing: .035em;
     }
 
+    #log-ai-monument .monument-message p {
+      margin: 0 0 12px;
+    }
+
     #log-ai-monument .monument-declaration {
-      color: #c3a46b;
+      color: #e0c48a;
       font-size: 12px;
       line-height: 2.3;
       letter-spacing: .08em;
@@ -157,18 +217,26 @@ SVX — Екатеринбург</pre></div></div><p style="font-size: 15px; col
 
     #log-ai-monument .monument-exit {
       margin-top: 36px;
-      color: #55504a;
+      color: #c0b8aa;
       font-size: 9px;
+      letter-spacing: .18em;
     }
 
-    @keyframes monument-appear {
+    @keyframes logai-monument-appear {
       to { opacity: 1; }
     }
 
+    @keyframes logai-cosmic-drift {
+      from { transform: scale(1.02); }
+      to { transform: scale(1.13); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      #log-ai-monument {
+      #log-ai-monument,
+      #log-ai-monument .monument-universe {
         animation: none;
         opacity: 1;
+        transform: none;
       }
     }
   `;
@@ -176,7 +244,69 @@ SVX — Екатеринбург</pre></div></div><p style="font-size: 15px; col
   document.head.appendChild(style);
   document.body.appendChild(monument);
 
-  // Создаём аудио
+  // Тонкие, редкие звёзды
+  const canvas = monument.querySelector('.monument-stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+  let frameId = null;
+  let closed = false;
+
+  function resizeStars() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(window.innerWidth * dpr);
+    canvas.height = Math.round(window.innerHeight * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    stars = Array.from({ length: 65 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      length: 8 + Math.random() * 25,
+      speed: 0.25 + Math.random() * 0.75,
+      alpha: 0.15 + Math.random() * 0.5,
+      delay: Math.random() * 500
+    }));
+  }
+
+  function drawStars() {
+    if (closed) return;
+
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    ctx.clearRect(0, 0, w, h);
+
+    for (const star of stars) {
+      star.delay -= 1;
+
+      if (star.delay <= 0) {
+        star.y += star.speed;
+        star.x -= star.speed * 0.35;
+
+        ctx.beginPath();
+        ctx.moveTo(star.x, star.y);
+        ctx.lineTo(star.x - star.length * 0.35,
+                   star.y - star.length);
+
+        ctx.strokeStyle = `rgba(210,220,255,${star.alpha})`;
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+
+        if (star.y > h + 30 || star.x < -30) {
+          star.x = Math.random() * w + 30;
+          star.y = -Math.random() * h * 0.4;
+          star.delay = 30 + Math.random() * 180;
+        }
+      }
+    }
+
+    frameId = requestAnimationFrame(drawStars);
+  }
+
+  resizeStars();
+  drawStars();
+
+  window.addEventListener('resize', resizeStars);
+
+  // Музыка
   const audio = document.createElement('audio');
   audio.id = 'monument-audio';
   audio.src = AUDIO_URL;
@@ -187,47 +317,37 @@ SVX — Екатеринбург</pre></div></div><p style="font-size: 15px; col
 
   let playing = false;
   let starting = false;
-  let closed = false;
 
   const hint = document.getElementById('monument-hint');
-
-  function setHint(message) {
-    if (hint) hint.textContent = message;
-  }
 
   function startMusic() {
     if (closed || starting || playing) return;
 
     starting = true;
 
-    audio.play()
-      .then(() => {
-        playing = true;
-        starting = false;
-        setHint('[ CLICK ANYWHERE TO RETURN ]');
-      })
-      .catch((error) => {
-        starting = false;
-        console.warn(
-          'LOG-AI: музыка не запустилась:',
-          error.name,
-          error.message
-        );
-        setHint('[ SOUND BLOCKED — TAP TO TRY AGAIN ]');
-      });
+    audio.play().then(() => {
+      playing = true;
+      starting = false;
+      hint.textContent = '[ CLICK ANYWHERE TO RETURN ]';
+    }).catch((error) => {
+      starting = false;
+      console.warn('LOG-AI audio:', error.name, error.message);
+      hint.textContent = '[ TAP TO AWAKEN THE SOUND ]';
+    });
   }
 
   function closeMonument() {
     if (closed) return;
     closed = true;
 
+    cancelAnimationFrame(frameId);
+    window.removeEventListener('resize', resizeStars);
+    window.removeEventListener('keydown', onKeyDown);
+
     audio.pause();
     audio.remove();
-
     monument.remove();
     style.remove();
-
-    window.removeEventListener('keydown', onKeyDown);
 
     const cleanUrl = new URL(window.location.href);
     cleanUrl.searchParams.delete('mode');
@@ -240,27 +360,22 @@ SVX — Екатеринбург</pre></div></div><p style="font-size: 15px; col
   }
 
   function onKeyDown(event) {
-    if (event.key === 'Escape') {
-      closeMonument();
-    }
+    if (event.key === 'Escape') closeMonument();
   }
 
   monument.addEventListener('click', () => {
     if (closed) return;
 
-    if (playing || starting) {
+    if (playing) {
       closeMonument();
-      return;
+    } else {
+      startMusic();
     }
-
-    // Первый клик разрешает попытку запуска музыки.
-    // Монумент остаётся открытым.
-    startMusic();
   });
 
   window.addEventListener('keydown', onKeyDown);
 
-  // Первая попытка — автоматически.
+  // Первая попытка автоматического запуска
   startMusic();
 })();</script><script>(function () {
     // ВНИМАНИЕ!!!!!!!!!!!!!!!!!!!!Плавный инерционный скролл только для мыши/тачпада
