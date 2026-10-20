@@ -14,7 +14,9 @@
 
   if (params.get('mode') !== 'monument') return;
 
-  const AUDIO_URL = 'https://log-ai.ru/media/files/interstellar.mp3';
+  // Реальный адрес твоего MP3
+  const AUDIO_URL =
+    'https://log-ai.ru/media/files/interstellar.mp3';
 
   const monument = document.createElement('div');
   monument.id = 'log-ai-monument';
@@ -48,7 +50,9 @@
         LOG·AI·ARCHITECTI·MMXXVI
       </p>
 
-      <p class="monument-exit">[ CLICK ANYWHERE TO RETURN ]</p>
+      <p id="monument-hint" class="monument-exit">
+        [ CLICK ANYWHERE TO RETURN ]
+      </p>
     </div>
   `;
 
@@ -155,26 +159,52 @@
   document.head.appendChild(style);
   document.body.appendChild(monument);
 
-  // Скрытая музыка монумента
+  // Создаём аудио
   const audio = document.createElement('audio');
   audio.id = 'monument-audio';
   audio.src = AUDIO_URL;
   audio.loop = true;
   audio.preload = 'auto';
   audio.volume = 0.35;
-  audio.style.display = 'none';
-
   document.body.appendChild(audio);
 
-  // Пытаемся запустить музыку автоматически
-  audio.play().catch((error) => {
-  console.error('LOG-AI: музыка не запустилась:', error.name, error.message);
-});
+  let playing = false;
+  let starting = false;
+  let closed = false;
+
+  const hint = document.getElementById('monument-hint');
+
+  function setHint(message) {
+    if (hint) hint.textContent = message;
+  }
+
+  function startMusic() {
+    if (closed || starting || playing) return;
+
+    starting = true;
+
+    audio.play()
+      .then(() => {
+        playing = true;
+        starting = false;
+        setHint('[ CLICK ANYWHERE TO RETURN ]');
+      })
+      .catch((error) => {
+        starting = false;
+        console.warn(
+          'LOG-AI: музыка не запустилась:',
+          error.name,
+          error.message
+        );
+        setHint('[ SOUND BLOCKED — TAP TO TRY AGAIN ]');
+      });
+  }
 
   function closeMonument() {
-    // Останавливаем музыку при закрытии
+    if (closed) return;
+    closed = true;
+
     audio.pause();
-    audio.currentTime = 0;
     audio.remove();
 
     monument.remove();
@@ -198,8 +228,23 @@
     }
   }
 
-  monument.addEventListener('click', closeMonument);
+  monument.addEventListener('click', () => {
+    if (closed) return;
+
+    if (playing || starting) {
+      closeMonument();
+      return;
+    }
+
+    // Первый клик разрешает попытку запуска музыки.
+    // Монумент остаётся открытым.
+    startMusic();
+  });
+
   window.addEventListener('keydown', onKeyDown);
+
+  // Первая попытка — автоматически.
+  startMusic();
 })();</script><script>(function () {
     // ВНИМАНИЕ!!!!!!!!!!!!!!!!!!!!Плавный инерционный скролл только для мыши/тачпада
     if (!window.matchMedia('(pointer: fine)').matches) return;
