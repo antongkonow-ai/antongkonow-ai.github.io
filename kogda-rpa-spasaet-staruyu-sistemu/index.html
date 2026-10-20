@@ -170,9 +170,9 @@
   document.body.appendChild(audio);
 
   // Пытаемся запустить музыку автоматически
-  audio.play().catch(() => {
-    // Браузер может запретить автоматическое воспроизведение.
-  });
+  audio.play().catch((error) => {
+  console.error('LOG-AI: музыка не запустилась:', error.name, error.message);
+});
 
   function closeMonument() {
     // Останавливаем музыку при закрытии
