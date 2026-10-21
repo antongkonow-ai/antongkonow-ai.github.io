@@ -47,6 +47,23 @@
   const monument = document.createElement('div');
   monument.id = 'log-ai-monument';
 
+  const root = document.documentElement;
+  const body = document.body;
+
+  const previousRootOverflow = root.style.overflow;
+  const previousBodyOverflow = body.style.overflow;
+  const previousBodyPosition = body.style.position;
+  const previousBodyTop = body.style.top;
+  const previousBodyWidth = body.style.width;
+  const previousScrollX = window.scrollX;
+  const previousScrollY = window.scrollY;
+
+  root.style.overflow = 'hidden';
+  body.style.overflow = 'hidden';
+  body.style.position = 'fixed';
+  body.style.top = `-${previousScrollY}px`;
+  body.style.width = '100%';
+
   monument.innerHTML = `
     <div class="monument-universe"></div>
     <canvas class="monument-stars"></canvas>
@@ -96,8 +113,14 @@
       position: fixed;
       inset: 0;
       z-index: 2147483647;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
       overflow-x: hidden;
       overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
       background: #03040a;
       color: #e5dfd3;
       display: grid;
@@ -338,11 +361,25 @@
     starting = true;
 
     audio.play().then(() => {
-      playing = true;
       starting = false;
+
+      if (closed) {
+        audio.pause();
+        return;
+      }
+
+      playing = true;
       hint.textContent = '[ CLICK ANYWHERE TO RETURN ]';
     }).catch((error) => {
       starting = false;
+
+      if (closed) return;
+
+      if (error.name === 'NotAllowedError') {
+        hint.textContent = '[ TAP TO AWAKEN THE SOUND ]';
+        return;
+      }
+
       console.warn('LOG-AI audio:', error.name, error.message);
       hint.textContent = '[ TAP TO AWAKEN THE SOUND ]';
     });
@@ -360,6 +397,14 @@
     audio.remove();
     monument.remove();
     style.remove();
+
+    root.style.overflow = previousRootOverflow;
+    body.style.overflow = previousBodyOverflow;
+    body.style.position = previousBodyPosition;
+    body.style.top = previousBodyTop;
+    body.style.width = previousBodyWidth;
+
+    window.scrollTo(previousScrollX, previousScrollY);
 
     const cleanUrl = new URL(window.location.href);
     cleanUrl.searchParams.delete('mode');
